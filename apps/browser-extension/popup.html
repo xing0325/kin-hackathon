@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>KIN conversations</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header><span class="mark">KIN</span><span class="eyebrow">CONVERSATION COLLECTOR</span></header>
+  <main>
+    <section class="summary">
+      <div><strong id="kept-count">0</strong><span>保留</span></div>
+      <div><strong id="ignored-count">0</strong><span>已忽略</span></div>
+      <div><strong id="pending-count">0</strong><span>待同步</span></div>
+    </section>
+    <p class="policy">默认保留全部会话。只有你主动标记 Ignore 的会话不会进入导出。</p>
+    <div class="actions">
+      <button id="chatgpt-bulk">ChatGPT 快速全量</button>
+      <button id="sync" class="secondary">五平台 DOM 补抓</button>
+      <button id="export">导出保留会话</button>
+    </div>
+    <p id="status" role="status"></p>
+    <p id="list-note"></p>
+    <section id="sessions" aria-label="会话列表"></section>
+  </main>
+  <template id="session-template">
+    <article class="session">
+      <div class="session-copy"><span class="source"></span><strong class="title"></strong><small class="meta"></small></div>
+      <label class="ignore"><input type="checkbox"><span>Ignore</span></label>
+    </article>
+  </template>
+  <script type="module" src="src/popup.mjs"></script>
+</body>
+</html>

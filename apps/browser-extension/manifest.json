@@ -1,0 +1,58 @@
+{
+  "manifest_version": 3,
+  "name": "KIN Conversation Collector",
+  "version": "0.3.0",
+  "description": "Keep your AI conversations locally and explicitly ignore sessions you do not want in KIN.",
+  "permissions": ["storage", "downloads", "tabs"],
+  "host_permissions": [
+    "https://chatgpt.com/*",
+    "https://chat.openai.com/*",
+    "https://claude.ai/*",
+    "https://gemini.google.com/*",
+    "https://www.doubao.com/*",
+    "https://doubao.com/*",
+    "https://chat.deepseek.com/*"
+  ],
+  "background": {
+    "scripts": ["src/background.mjs"],
+    "service_worker": "src/background.mjs",
+    "type": "module"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "kin-conversation-collector@kin.local",
+      "strict_min_version": "121.0"
+    }
+  },
+  "action": {
+    "default_title": "KIN conversations",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://chatgpt.com/*", "https://chat.openai.com/*"],
+      "js": ["src/page-bridge.js"],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "https://chatgpt.com/*",
+        "https://chat.openai.com/*",
+        "https://claude.ai/*",
+        "https://gemini.google.com/*",
+        "https://www.doubao.com/*",
+        "https://doubao.com/*",
+        "https://chat.deepseek.com/*"
+      ],
+      "js": ["src/content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["src/shared/*.mjs", "src/adapters/*.mjs", "src/page-bridge.js"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

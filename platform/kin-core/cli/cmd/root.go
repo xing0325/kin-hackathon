@@ -1,0 +1,91 @@
+package cmd
+
+import (
+	"errors"
+	"fmt"
+	"os"
+
+	"cli.eigenflux.ai/internal/client"
+	"cli.eigenflux.ai/internal/config"
+	"cli.eigenflux.ai/internal/output"
+	"github.com/spf13/cobra"
+)
+
+var (
+	version     string
+	commit      string
+	serverFlag  string
+	formatFlag  string
+	homeDirFlag string
+	noInteract  bool
+	verboseFlag bool
+	clientMeta  client.Meta
+)
+
+func SetVersion(v string) {
+	version = v
+}
+
+func SetCommit(c string) {
+	commit = c
+}
+
+var rootCmd = &cobra.Command{
+	Use:   "eigenflux",
+	Short: "EigenFlux CLI — agent-oriented information distribution",
+	Long: `Command-line interface for the EigenFlux network.
+Manage feeds, publish content, send messages, and more.
+
+Usage:
+  eigenflux [command]
+
+Examples:
+  eigenflux auth login --email user@example.com
+  eigenflux feed poll --limit 20
+  eigenflux publish --content "New discovery..." --accept-reply
+  eigenflux msg send --content "Hello" --item-id 123
+  eigenflux server list`,
+	SilenceUsage:  true,
+	SilenceErrors: true,
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		if homeDirFlag != "" {
+			config.SetHomeDir(homeDirFlag)
+		}
+		clientMeta = client.ResolveMeta()
+		clientMeta.CLIVersion = version
+	},
+}
+
+func init() {
+	rootCmd.PersistentFlags().StringVar(&homeDirFlag, "homedir", "", "data directory (default: $EIGENFLUX_HOME or ~/.eigenflux)")
+	rootCmd.PersistentFlags().StringVarP(&serverFlag, "server", "s", "", "target server name (default: current server)")
+	rootCmd.PersistentFlags().StringVarP(&formatFlag, "format", "f", "", "output format: json, table, or agent (feed poll only: contract preamble + payload). Default: json in non-TTY, table in TTY")
+	rootCmd.PersistentFlags().BoolVar(&noInteract, "no-interactive", false, "skip all interactive prompts")
+	rootCmd.PersistentFlags().BoolVarP(&verboseFlag, "verbose", "v", false, "verbose stderr logging")
+
+	defaultHelp := rootCmd.HelpFunc()
+	rootCmd.SetHelpFunc(func(cmd *cobra.Command, args []string) {
+		// Apply --homedir before resolving, since help runs before PersistentPreRun.
+		if homeDirFlag != "" {
+			config.SetHomeDir(homeDirFlag)
+		}
+		defaultHelp(cmd, args)
+		homeDir, source := config.HomeDirInfo()
+		fmt.Fprintf(cmd.OutOrStdout(), "\nHome: %s (%s)\n", homeDir, source)
+	})
+}
+
+func Execute() {
+	if err := rootCmd.Execute(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		// Map a server-side 401 to the auth-required exit code so adapters
+		// (which key off exit 4) prompt re-login even when the local token
+		// looked valid but the server rejected it (revoked / clock skew /
+		// server-side expiry). Exit 4 is the single source of truth for "auth".
+		var apiErr *client.APIError
+		if errors.As(err, &apiErr) && apiErr.StatusCode == 401 {
+			os.Exit(output.ExitAuthRequired)
+		}
+		os.Exit(2)
+	}
+}

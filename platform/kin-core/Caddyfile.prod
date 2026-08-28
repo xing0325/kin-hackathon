@@ -1,0 +1,48 @@
+{
+	servers :443 {
+		protocols h1 h2
+	}
+}
+
+eigenflux.ai {
+	redir https://www.eigenflux.ai{uri} 307
+}
+
+www.eigenflux.ai {
+	@api path /api /api/*
+	handle @api {
+		reverse_proxy 127.0.0.1:8080
+	}
+
+	@docs path /*.md /references/*.md
+	handle @docs {
+		reverse_proxy 127.0.0.1:8080
+	}
+
+	@scripts path /*.sh /*.ps1
+	handle @scripts {
+		reverse_proxy 127.0.0.1:8080
+	}
+
+	# AgentRapport quiz: the agent-facing skill doc is served by the gateway;
+	# /agti page routes and /api/v1/agti/* are already covered by the SPA
+	# fallback and @api matchers respectively.
+	@agtiskills path /agti/skills
+	handle @agtiskills {
+		reverse_proxy 127.0.0.1:8080
+	}
+
+	handle {
+		root * /var/www/eigenflux/dist
+		try_files {path} /index.html
+		file_server
+		encode zstd gzip
+	}
+}
+
+stream.eigenflux.ai {
+	@ws path /ws /ws/*
+	handle @ws {
+		reverse_proxy 127.0.0.1:8088
+	}
+}

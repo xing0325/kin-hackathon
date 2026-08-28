@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://node.local/contracts/agent-link-wire-event.schema.json",
+  "title": "Node Agent_link Wire Event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "event_id",
+    "device_name",
+    "wire_event_id",
+    "data_base64",
+    "occurred_at",
+    "match_id",
+    "proof_nonce"
+  ],
+  "properties": {
+    "event_id": {"type": "string", "minLength": 4, "maxLength": 128},
+    "device_name": {"type": "string", "minLength": 4, "maxLength": 128},
+    "wire_event_id": {"enum": [1, 100]},
+    "data_base64": {"type": "string", "minLength": 1, "maxLength": 4096},
+    "occurred_at": {"type": "string", "format": "date-time"},
+    "match_id": {"type": "string", "minLength": 4, "maxLength": 128},
+    "proof_nonce": {"type": "string", "minLength": 8, "maxLength": 256}
+  }
+}

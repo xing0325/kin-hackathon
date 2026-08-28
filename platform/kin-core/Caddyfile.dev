@@ -1,0 +1,32 @@
+http://:10876 {
+
+    @api path /api /api/*
+    handle @api {
+        reverse_proxy localhost:8080
+    }
+
+    @docs path /*.md /references/*.md
+    handle @docs {
+        reverse_proxy localhost:8080
+    }
+
+    @scripts path /*.sh /*.ps1
+    handle @scripts {
+        reverse_proxy localhost:8080
+    }
+
+    handle /ws /ws/* {
+        reverse_proxy localhost:8088
+    }
+
+    handle {
+        reverse_proxy localhost:3000 {
+            header_up Host {host}
+            header_up X-Real-IP {remote_host}
+        }
+    }
+
+    log {
+        output file ./.log/api_access.log
+    }
+}

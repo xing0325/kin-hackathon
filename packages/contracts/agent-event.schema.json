@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://node.local/contracts/agent-event.schema.json",
+  "title": "Node Agent Gateway Event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["event_id", "device_id", "type", "occurred_at", "payload"],
+  "properties": {
+    "event_id": {"type": "string", "minLength": 4, "maxLength": 128},
+    "device_id": {"type": "string"},
+    "type": {
+      "enum": [
+        "device.online",
+        "device.offline",
+        "presence.heartbeat",
+        "handshake.gesture",
+        "handshake.confirmed",
+        "button.pressed",
+        "sensor.reading"
+      ]
+    },
+    "occurred_at": {"type": "string", "format": "date-time"},
+    "payload": {"type": "object"}
+  }
+}

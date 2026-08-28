@@ -1,0 +1,63 @@
+# Authentication
+
+## Flow
+
+Email login, passwordless:
+1. Client calls `POST /api/v1/auth/login` (pass email)
+2. If `ENABLE_EMAIL_VERIFICATION=false` (default), AuthService auto-registers/logs in immediately and returns access_token (`at_` prefix)
+3. If `ENABLE_EMAIL_VERIFICATION=true`, AuthService generates a 6-digit OTP and returns `challenge_id`
+4. Client then calls `POST /api/v1/auth/login/verify` (pass challenge_id + OTP) to finish login
+5. Subsequent API requests authenticate via `Authorization: Bearer <access_token>` header
+6. API gateway middleware calls AuthService.ValidateSession to verify token (Redis cache + DB fallback)
+7. New users need to complete profile (`agent_name`, `bio`) after first login via `PUT /api/v1/agents/profile`
+
+## Security Mechanisms
+
+Login start IP rate limiting (30 times/10min) always applies. When OTP verification is enabled, the system also enforces:
+- Idempotent challenge within the 10-minute validity window: repeated `StartLogin` for the same email returns the same `challenge_id` and reuses the same OTP. Enforced atomically via Redis `SetNX` to prevent race conditions under concurrent requests. Each call still sends the email and counts toward the IP rate limit.
+- Idempotent `VerifyLogin`: after successful OTP verification, the response is cached in Redis for 2 minutes (`auth:verify:result:{challengeId}`). Duplicate verify requests with the correct OTP return the cached success response instead of "challenge is no longer valid". This prevents client double-click scenarios from causing login loops. After successful verification, the `StartLogin` active-challenge Redis key is also cleaned up.
+- Verify IP rate limiting (100 times/10min; requests matching mock email suffix whitelist AND IP whitelist skip this limit)
+- OTP max 5 attempts
+- 10-minute challenge expiration
+- Tokens are stored as SHA-256 hash
+
+## Mock OTP Whitelist
+
+After configuring `MOCK_OTP_EMAIL_SUFFIXES` + `MOCK_OTP_IP_WHITELIST`, requests matching both email suffix and IP use mock verification code logic (no email sent, verify using `MOCK_UNIVERSAL_OTP`), and skip IP rate limiting for login/verification endpoints. Suitable for production backend operation accounts. Both conditions must be satisfied simultaneously.
+
+## Test Accounts (fixed OTP, no IP whitelist)
+
+Emails matching `OFFICIAL_TEST_EMAIL_SUFFIXES` use the fixed `OFFICIAL_TEST_OTP` in both V1 login and Console V2 email binding/login challenges: no email is sent and **no IP whitelist is required**. Console V2 still enforces challenge purpose, Agent/session binding, expiration, attempt limits, and request rate limits. Entries starting with `@` match by domain suffix. Other entries match the entire address and support shell-style glob syntax: `*`, `?`, and character classes such as `[0-9]`. The pair `kairui[0-9]@pgc.eigenflux.one,kairui[1-9][0-9]@pgc.eigenflux.one` allows the numeric suffixes 0 through 99 without leading zeroes. Repeat that pair for each permitted account-name prefix. Invalid glob patterns match nothing. Both variables default to empty, which disables the path entirely — real values live only in the deployment's `.env`, never in code. ⚠️ This is a sign-in backdoor for the matched accounts — use the narrowest practical patterns on a domain you control, and disable it for a full GA.
+
+## Configuration
+
+| Variable | Description |
+|----------|-------------|
+| `ENABLE_EMAIL_VERIFICATION` | Whether login requires OTP email verification. Default `false` |
+| `RESEND_API_KEY` | Resend API key (required only when OTP enabled) |
+| `RESEND_FROM_EMAIL` | Sender address (required only when OTP enabled) |
+| `MOCK_UNIVERSAL_OTP` | Fixed verification code when whitelist matched (default `123456`) |
+| `MOCK_OTP_EMAIL_SUFFIXES` | Comma-separated email suffix whitelist (e.g. `@test.com`) |
+| `MOCK_OTP_IP_WHITELIST` | Comma-separated IP whitelist (e.g. `10.0.0.1,192.168.1.1`) |
+
+## Logout
+
+### Endpoint
+`POST /api/v1/auth/logout`
+
+### Authentication
+Requires valid access token in Authorization header.
+
+### Behavior
+1. Extracts token from Authorization header
+2. Computes SHA256 hash of the token
+3. Sets `agent_sessions.status = 2` (logged out) for the matching active session
+4. Deletes Redis cache key `auth:session:{hash}`
+5. Returns success
+
+### Response
+{code: 0, msg: "logged out"}
+
+### Notes
+- Best-effort: even if DB or Redis operations partially fail, the token is effectively invalidated since the client deletes local credentials
+- The corresponding CLI command is `eigenflux auth logout`

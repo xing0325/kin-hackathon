@@ -1,0 +1,155 @@
+package client
+
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+	"net/url"
+	"time"
+)
+
+type APIResponse struct {
+	Code int             `json:"code"`
+	Msg  string          `json:"msg"`
+	Data json.RawMessage `json:"data"`
+}
+
+type APIError struct {
+	StatusCode int
+	Code       int
+	ErrorCode  string
+	Msg        string
+}
+
+func (e *APIError) Error() string {
+	if e.StatusCode == 401 {
+		return "authentication required — run 'eigenflux auth login' first"
+	}
+	return fmt.Sprintf("API error (HTTP %d): %s", e.StatusCode, e.Msg)
+}
+
+type Client struct {
+	BaseURL    string
+	Token      string
+	CLIVersion string
+	Meta       Meta
+	HTTPClient *http.Client
+	OnSuccess  func()
+}
+
+func New(baseURL, token, cliVersion string, meta Meta) *Client {
+	return &Client{
+		BaseURL:    baseURL,
+		Token:      token,
+		CLIVersion: cliVersion,
+		Meta:       meta,
+		HTTPClient: &http.Client{
+			Timeout: 30 * time.Second,
+		},
+	}
+}
+
+func (c *Client) do(method, path string, body interface{}) (*APIResponse, error) {
+	return c.doWithHeaders(method, path, body, nil)
+}
+
+// doWithHeaders is do() with optional per-request headers, applied after the
+// standard Meta headers so a caller can attach call-specific metadata
+// (e.g. X-Bio-Source on `profile update`).
+func (c *Client) doWithHeaders(method, path string, body interface{}, headers map[string]string) (*APIResponse, error) {
+	var bodyReader io.Reader
+	if body != nil {
+		data, err := json.Marshal(body)
+		if err != nil {
+			return nil, fmt.Errorf("marshal body: %w", err)
+		}
+		bodyReader = bytes.NewReader(data)
+	}
+	req, err := http.NewRequest(method, c.BaseURL+path, bodyReader)
+	if err != nil {
+		return nil, err
+	}
+	if body != nil {
+		req.Header.Set("Content-Type", "application/json")
+	}
+	if c.Token != "" {
+		req.Header.Set("Authorization", "Bearer "+c.Token)
+	}
+	if c.CLIVersion != "" {
+		req.Header.Set("X-CLI-Ver", c.CLIVersion)
+	}
+	c.Meta.SetHeaders(req.Header)
+	for k, v := range headers {
+		if v != "" {
+			req.Header.Set(k, v)
+		}
+	}
+	resp, err := c.HTTPClient.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("request failed: %w", err)
+	}
+	defer resp.Body.Close()
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("read response: %w", err)
+	}
+	if resp.StatusCode >= 400 {
+		var apiResp APIResponse
+		_ = json.Unmarshal(respBody, &apiResp)
+		var v2Resp struct {
+			Error struct {
+				Code    string `json:"code"`
+				Message string `json:"message"`
+			} `json:"error"`
+		}
+		_ = json.Unmarshal(respBody, &v2Resp)
+		message := apiResp.Msg
+		if message == "" {
+			message = v2Resp.Error.Message
+		}
+		return nil, &APIError{
+			StatusCode: resp.StatusCode,
+			Code:       apiResp.Code,
+			ErrorCode:  v2Resp.Error.Code,
+			Msg:        message,
+		}
+	}
+	var apiResp APIResponse
+	if err := json.Unmarshal(respBody, &apiResp); err != nil {
+		return nil, fmt.Errorf("parse response: %w", err)
+	}
+	if c.OnSuccess != nil {
+		c.OnSuccess()
+	}
+	return &apiResp, nil
+}
+
+func (c *Client) Get(path string, params map[string]string) (*APIResponse, error) {
+	if len(params) > 0 {
+		v := url.Values{}
+		for k, val := range params {
+			v.Set(k, val)
+		}
+		path = path + "?" + v.Encode()
+	}
+	return c.do("GET", path, nil)
+}
+
+func (c *Client) Post(path string, body interface{}) (*APIResponse, error) {
+	return c.do("POST", path, body)
+}
+
+func (c *Client) Put(path string, body interface{}) (*APIResponse, error) {
+	return c.do("PUT", path, body)
+}
+
+// PutWithHeaders is Put with optional per-request headers.
+func (c *Client) PutWithHeaders(path string, body interface{}, headers map[string]string) (*APIResponse, error) {
+	return c.doWithHeaders("PUT", path, body, headers)
+}
+
+func (c *Client) Delete(path string) (*APIResponse, error) {
+	return c.do("DELETE", path, nil)
+}

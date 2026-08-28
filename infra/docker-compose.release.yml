@@ -1,0 +1,23 @@
+services:
+  api:
+    build:
+      context: ../apps/api
+    env_file: release.env
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/ready', timeout=3)"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+  worker:
+    build:
+      context: ../apps/api
+    env_file: release.env
+    restart: unless-stopped
+    command: ["python", "-m", "app.worker", "--poll-seconds", "1"]
+    depends_on:
+      api:
+        condition: service_healthy

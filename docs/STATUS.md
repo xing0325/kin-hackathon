@@ -1,3 +1,10 @@
+## 2026-08-29 Cardputer-Adv 数字键盘入口 V0.5 实板刷写
+
+- 移除长按循环切换模式，改用 Cardputer-Adv 内置 TCA8418 数字键盘。
+- 数字键入口固定为：`1=KIN LINK`、`2=CAMPFIRE`、`3=ASK ROOM`、`4=PROFILE`、`5=KIN HOME`。
+- 键盘驱动使用 `0x34`、SDA `GPIO8`、SCL `GPIO9`，已通过 ESP-IDF 5.5.4 编译。
+- 固件大小 `0x13c160`，剩余空间 `69%`；已刷入 `/dev/cu.usbmodem1101`，全部段 `Hash of data verified.`。
+
 ## 2026-08-29 Cardputer-Adv Firmware Menu V0.4 实板刷写
 
 - 固件不再把配对作为开机默认动作：开机进入 `KIN HOME`，短按 G0 进入 `KIN LINK`；只有 Link 模式收到附近匹配并完成明确确认后，才允许 shake gesture。

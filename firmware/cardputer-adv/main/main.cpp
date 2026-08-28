@@ -7,6 +7,7 @@
 #include "agent_link.h"
 #include "gesture_detector.hpp"
 #include "handshake_gate.hpp"
+#include "cardputer_keyboard.hpp"
 #include "esp_err.h"
 #include "esp_log.h"
 #include "esp_mac.h"
@@ -38,6 +39,7 @@ std::atomic_bool g_handshake_armed{false};
 std::atomic_bool g_gesture_seen{false};
 enum class MenuMode : uint8_t { HOME, LINK, CAMPFIRE, ASK_ROOM, PROFILE };
 std::atomic<MenuMode> g_menu_mode{MenuMode::HOME};
+CardputerKeyboard g_keyboard;
 std::atomic_int g_battery_percent{-1};
 std::atomic_uint32_t g_last_interaction_ms{0};
 
@@ -227,12 +229,25 @@ void PushGestureEvent(float peak_g) {
     if (err == ESP_OK) { g_gesture_seen.store(true); M5.Speaker.tone(1400, 120); g_last_interaction_ms.store(M5.millis()); QueueUi("GESTURE SENT\nWAITING PEER"); }
 }
 
+void HandleNumberKey(uint8_t key) {
+    switch (key) {
+        case 1: SetMenuMode(MenuMode::LINK); break;
+        case 2: SetMenuMode(MenuMode::CAMPFIRE); break;
+        case 3: SetMenuMode(MenuMode::ASK_ROOM); break;
+        case 4: SetMenuMode(MenuMode::PROFILE); break;
+        case 5: SetMenuMode(MenuMode::HOME); break;
+        default: break;
+    }
+}
+
 void InputTask(void*) {
     uint32_t last_gesture_ms = 0;
     uint32_t last_telemetry_ms = 0;
     GestureDetector gesture_detector;
     while (true) {
         M5.update();
+        const uint8_t number_key = g_keyboard.pressedNumber();
+        if (number_key) HandleNumberKey(number_key);
         if (M5.BtnA.wasPressed()) PushButtonEvent();
 
         float ax = 0, ay = 0, az = 0;
@@ -318,6 +333,7 @@ extern "C" void app_main() {
     m5cfg.internal_mic = true;
     m5cfg.internal_spk = true;
     M5.begin(m5cfg);
+    g_keyboard.begin();
     M5.Display.setRotation(1);
     M5.Display.setBrightness(128);
     M5.Speaker.setVolume(96);

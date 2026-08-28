@@ -245,16 +245,16 @@ export class FluidGlassField {
     ctx.restore();
 
     if (this.logoReady) {
-      // Convert the supplied monochrome mark into a red-channel mask so the
-      // liquid glass simulation uses the actual KIN symbol and wordmark.
-      const logoSize = size * (compact ? 1.38 : 1.12);
-      const logoW = logoSize * 0.88;
-      const logoH = logoSize;
+      // Separate the supplied icon from the wordmark: the icon remains a
+      // liquid-glass object while KIN gets a larger, clearer typographic mask.
+      const iconSize = size * (compact ? 0.72 : 0.58);
+      const iconW = iconSize * 0.88;
+      const iconH = iconSize * 0.62;
       const imageCanvas = document.createElement("canvas");
-      imageCanvas.width = Math.max(1, Math.round(logoW));
-      imageCanvas.height = Math.max(1, Math.round(logoH));
+      imageCanvas.width = Math.max(1, Math.round(iconW));
+      imageCanvas.height = Math.max(1, Math.round(iconH));
       const imageCtx = imageCanvas.getContext("2d");
-      imageCtx.drawImage(this.logoImage, 0, 0, imageCanvas.width, imageCanvas.height);
+      imageCtx.drawImage(this.logoImage, 0, 0, this.logoImage.naturalWidth, Math.round(this.logoImage.naturalHeight * 0.59), 0, 0, imageCanvas.width, imageCanvas.height);
       const pixels = imageCtx.getImageData(0, 0, imageCanvas.width, imageCanvas.height);
       for (let i = 0; i < pixels.data.length; i += 4) {
         const luminance = (pixels.data[i] + pixels.data[i + 1] + pixels.data[i + 2]) / 3;
@@ -262,7 +262,10 @@ export class FluidGlassField {
         pixels.data[i] = 255; pixels.data[i + 1] = 0; pixels.data[i + 2] = 0; pixels.data[i + 3] = alpha;
       }
       imageCtx.putImageData(pixels, 0, 0);
-      ctx.drawImage(imageCanvas, focalX - logoW / 2, focalY - logoH / 2, logoW, logoH);
+      ctx.drawImage(imageCanvas, focalX - iconW / 2, focalY - size * 0.48, iconW, iconH);
+      ctx.font = `800 ${Math.round(size * (compact ? 0.78 : 0.66))}px Inter, Arial, sans-serif`;
+      if ("letterSpacing" in ctx) ctx.letterSpacing = `${Math.round(size * 0.08)}px`;
+      ctx.fillText(this.options.word, focalX, focalY + size * 0.34);
     } else {
       ctx.font = `800 ${Math.round(size)}px Inter, Arial, sans-serif`;
       if ("letterSpacing" in ctx) ctx.letterSpacing = `${Math.round(size * 0.07)}px`;

@@ -1,3 +1,9 @@
+## 2026-08-29 KIN logo refresh
+
+- Intro hero liquid mask now derives from the supplied KIN mark image; the top-left header uses the cropped mark as well.
+- Public fallback copy keeps `/brand/kin-logo-cropped.jpg` stable under GitHub Pages.
+- Verification: frontend tests `4 passed`; Vite build `107 modules transformed`.
+
 ## 2026-08-29 Animated intro GitHub Pages
 
 - GitHub Pages workflow now builds the animated KIN intro from `apps/web` alongside the user demo.

@@ -333,7 +333,7 @@ extern "C" void app_main() {
     m5cfg.internal_mic = true;
     m5cfg.internal_spk = true;
     M5.begin(m5cfg);
-    g_keyboard.begin();
+    ESP_LOGI(kTag, "keyboard_tca8418=%d", g_keyboard.begin());
     M5.Display.setRotation(1);
     M5.Display.setBrightness(128);
     M5.Speaker.setVolume(96);

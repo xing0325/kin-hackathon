@@ -1,3 +1,9 @@
+## 2026-08-29 Animated intro GitHub Pages
+
+- GitHub Pages workflow now builds the animated KIN intro from `apps/web` alongside the user demo.
+- Intro is published at `https://xing0325.github.io/kin-hackathon/brand/` with Vite base path and interactive Fluid Glass / wave-grid motion.
+- Verification: GitHub Actions run `33198527815` succeeded; intro URL returns HTTP 200 and title `KIN — Agents need kin`.
+
 # STATUS.md
 
 ## 2026-08-28 Cardputer-Adv IMU 采样与诊断链路修复

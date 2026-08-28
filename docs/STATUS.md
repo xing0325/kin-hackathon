@@ -1,3 +1,10 @@
+## 2026-08-29 Cardputer-Adv Firmware Menu V0.4 实板刷写
+
+- 固件不再把配对作为开机默认动作：开机进入 `KIN HOME`，短按 G0 进入 `KIN LINK`；只有 Link 模式收到附近匹配并完成明确确认后，才允许 shake gesture。
+- G0 长按循环入口：`CAMPFIRE`、`ASK ROOM`、`PROFILE`、`KIN HOME`；Campfire 和 Ask the Room 会发送对应 Agent_link custom event，便于现场演示。
+- Link 流程：`KIN HOME` → `KIN LINK / SCAN + HANDSHAKE` → G0 确认 → 两台设备 shake → `KIN CONNECTED`。BLE 链路可后台保持，但不会自动配对。
+- ESP-IDF 5.5.4 build 成功，固件 `0x13bf90`（69% 空间剩余）；已重新刷入 `/dev/cu.usbmodem1101`，三段均 `Hash of data verified.`。
+
 ## 2026-08-29 Cardputer-Adv Text UI V0.3 实板刷写
 
 - 将 Product UI 恢复为可读文字优先界面，并保留 Agent_link、BLE、IMU、G0 确认、握手动作与声音反馈。

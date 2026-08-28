@@ -36,6 +36,8 @@ std::atomic_bool g_link_ready{false};
 std::atomic_bool g_confirmed{false};
 std::atomic_bool g_handshake_armed{false};
 std::atomic_bool g_gesture_seen{false};
+enum class MenuMode : uint8_t { HOME, LINK, CAMPFIRE, ASK_ROOM, PROFILE };
+std::atomic<MenuMode> g_menu_mode{MenuMode::HOME};
 std::atomic_int g_battery_percent{-1};
 std::atomic_uint32_t g_last_interaction_ms{0};
 
@@ -149,6 +151,22 @@ void OnAudioEnd(void*) {
     ESP_LOGI(kTag, "audio segment queued to completion");
 }
 
+const char* MenuLabel(MenuMode mode) {
+    switch (mode) {
+        case MenuMode::LINK: return "KIN LINK\nSCAN + HANDSHAKE";
+        case MenuMode::CAMPFIRE: return "CAMPFIRE\nBUILD TOGETHER";
+        case MenuMode::ASK_ROOM: return "ASK ROOM\nBROADCAST NEED";
+        case MenuMode::PROFILE: return "PROFILE\nBUILDER CONTEXT";
+        default: return "KIN HOME\nSELECT A MODE";
+    }
+}
+
+void SetMenuMode(MenuMode mode) {
+    g_menu_mode.store(mode);
+    if (mode != MenuMode::LINK) { g_handshake_armed.store(false); g_confirmed.store(false); g_gesture_seen.store(false); }
+    QueueUi(MenuLabel(mode));
+}
+
 void OnShowText(const char* text, void*) {
     if (text && std::strstr(text, "KIN CONNECTED")) {
         g_handshake_connected.store(true);
@@ -158,7 +176,7 @@ void OnShowText(const char* text, void*) {
         M5.Speaker.tone(1800, 350);
     } else if (text && std::strstr(text, "KIN READY")) {
         g_handshake_connected.store(false);
-        g_handshake_armed.store(true);
+        g_handshake_armed.store(g_menu_mode.load() == MenuMode::LINK);
         g_confirmed.store(false);
         g_gesture_seen.store(false);
     }
@@ -170,16 +188,28 @@ void OnState(agent_state_t state, void*) {
     if (g_handshake_connected.load()) return;
     const char* label = "AGENT LINK\nOFFLINE";
     if (state == AGENT_STATE_CONNECTED) label = "AGENT LINK\nCONNECTING";
-    if (state == AGENT_STATE_READY) label = g_handshake_armed.load() ? "KIN HOME\nWAITING MATCH" : "KIN HOME\nREADY";
+    if (state == AGENT_STATE_READY) label = g_menu_mode.load() == MenuMode::LINK ? "KIN LINK\nSCAN + HANDSHAKE" : MenuLabel(g_menu_mode.load());
     if (state != AGENT_STATE_READY) { g_confirmed.store(false); g_handshake_armed.store(false); g_gesture_seen.store(false); }
     ESP_LOGI(kTag, "Agent_link state=%d", int(state));
     QueueUi(label);
 }
 
 void PushButtonEvent() {
+    if (g_menu_mode.load() == MenuMode::HOME) { SetMenuMode(MenuMode::LINK); return; }
+    if (g_menu_mode.load() == MenuMode::CAMPFIRE) {
+        const char payload[] = "{\"kind\":\"campfire.enter\"}";
+        agent_link_push_event(AGENT_EVT_CUSTOM, reinterpret_cast<const uint8_t*>(payload), sizeof(payload)-1);
+        QueueUi("CAMPFIRE\nROOM OPEN"); return;
+    }
+    if (g_menu_mode.load() == MenuMode::ASK_ROOM) {
+        const char payload[] = "{\"kind\":\"need.broadcast\",\"text\":\"ASK THE ROOM\"}";
+        agent_link_push_event(AGENT_EVT_CUSTOM, reinterpret_cast<const uint8_t*>(payload), sizeof(payload)-1);
+        QueueUi("ASK ROOM\nNEED SENT"); return;
+    }
+    if (g_menu_mode.load() == MenuMode::PROFILE) { QueueUi("PROFILE\nCONTEXT READY"); return; }
     if (g_handshake_connected.load()) return;
     if (!g_link_ready.load()) { QueueUi("KIN OFFLINE\nRECONNECTING"); return; }
-    if (!g_handshake_armed.load()) { QueueUi("KIN HOME\nNO ACTIVE MATCH"); return; }
+    if (!g_handshake_armed.load()) { QueueUi("KIN LINK\nWAITING MATCH"); return; }
     if (g_confirmed.load()) { QueueUi("CONFIRMED\nSHAKE NOW"); return; }
     const uint8_t payload[2] = {0, 1};
     const esp_err_t err = agent_link_push_event(AGENT_EVT_BUTTON, payload, sizeof(payload));

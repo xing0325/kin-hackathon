@@ -1,5 +1,17 @@
 # STATUS.md
 
+## 2026-08-28 GitHub Pages team handoff
+
+- 已将当前 KIN 完整源码方案整理为公开单仓库 `xing0325/kin-hackathon`，包含用户端、FastAPI、EigenFlux/KIN Core、Cardputer 固件、Agent_link Relay、Conversation Collector、TiDB migrations 和交接文档。
+- 已排除 `.env`、Keychain 凭据、本地工作区、依赖目录和编译产物；发布前凭据模式扫描 `matches=0`。
+- 新增队友首页 README 和 `docs/FRONTEND_HANDOFF.md`，列明页面路由、源文件、Demo/Real 数据模式、产品不变式与 PR 流程。
+- GitHub Actions 已验证 `npm ci` → `21 tests` → Vite build → Pages deploy，Run `33175599424` 结果 `success`。
+- GitHub Pages 已上线：`https://xing0325.github.io/kin-hackathon/`；默认使用确定性 Demo fixtures，通过 hash routing 支持直接分享任意用户页。
+
+Next action:
+
+- 队友从 `main` 切剆支优化用户端；主线继续最终双 Cardputer 真机验收。
+
 ## 2026-08-28 TiDB Cloud Starter V0.11 schema deployment
 
 - 已生成新实例应用密码并替换 macOS Keychain 中的 host/port/username/password；明文临时文件已删除，仓库未写入凭据。

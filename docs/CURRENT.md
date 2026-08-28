@@ -14,6 +14,7 @@ Discover → Understand → Context Handshake → Shared Context → Agent Help.
 - Broadcast supports NEED, BUILDING, SOLVED, DISCOVERED and AVAILABLE; matching Signals and relationship commitments feed proactive Today cards.
 - Conversation Collector keeps raw conversations local; KIN Bridge produces summary-only candidates, and Context Studio requires explicit approval before publication.
 - V0.11 adds signed multi-user sessions, a persistent Agent Inbox, request tracing, metrics, readiness checks and a repeatable two-account/two-device release regression.
+- The complete source handoff is public at `github.com/xing0325/kin-hackathon`; its deterministic user demo is continuously deployed to `xing0325.github.io/kin-hackathon/` for frontend collaboration.
 
 ## Active implementation
 

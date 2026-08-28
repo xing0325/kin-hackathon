@@ -6,6 +6,7 @@
 #include <M5Unified.h>
 #include "agent_link.h"
 #include "gesture_detector.hpp"
+#include "handshake_gate.hpp"
 #include "esp_err.h"
 #include "esp_log.h"
 #include "esp_mac.h"
@@ -17,7 +18,7 @@
 namespace {
 
 constexpr char kTag[] = "node.cardputer";
-constexpr char kFirmwareVersion[] = "0.2.0";
+constexpr char kFirmwareVersion[] = "0.3.0-text";
 constexpr size_t kUiTextBytes = 192;
 constexpr size_t kSpeakerBufferBytes = 16 * 1024;
 constexpr uint32_t kGestureCooldownMs = 1500;
@@ -33,6 +34,8 @@ char g_device_name[24] = "NODE-UNKNOWN";
 std::atomic_bool g_handshake_connected{false};
 std::atomic_bool g_link_ready{false};
 std::atomic_bool g_confirmed{false};
+std::atomic_bool g_handshake_armed{false};
+std::atomic_bool g_gesture_seen{false};
 std::atomic_int g_battery_percent{-1};
 std::atomic_uint32_t g_last_interaction_ms{0};
 
@@ -114,7 +117,7 @@ void DrawUi(const char* text) {
 
 void UiTask(void*) {
     UiMessage message{};
-    std::snprintf(message.text, sizeof(message.text), "BOOTING\nAGENT LINK");
+    std::snprintf(message.text, sizeof(message.text), "KIN BOOT\nCONNECTING");
     int shown_battery = -2;
     while (true) {
         const BaseType_t received = xQueueReceive(g_ui_queue, &message, pdMS_TO_TICKS(1000));
@@ -149,10 +152,15 @@ void OnAudioEnd(void*) {
 void OnShowText(const char* text, void*) {
     if (text && std::strstr(text, "KIN CONNECTED")) {
         g_handshake_connected.store(true);
+        g_handshake_armed.store(false);
+        g_confirmed.store(false);
+        g_gesture_seen.store(false);
         M5.Speaker.tone(1800, 350);
     } else if (text && std::strstr(text, "KIN READY")) {
         g_handshake_connected.store(false);
+        g_handshake_armed.store(true);
         g_confirmed.store(false);
+        g_gesture_seen.store(false);
     }
     QueueUi(text);
 }
@@ -162,41 +170,31 @@ void OnState(agent_state_t state, void*) {
     if (g_handshake_connected.load()) return;
     const char* label = "AGENT LINK\nOFFLINE";
     if (state == AGENT_STATE_CONNECTED) label = "AGENT LINK\nCONNECTING";
-    if (state == AGENT_STATE_READY) label = "AGENT LINK\nREADY";
-    if (state != AGENT_STATE_READY) g_confirmed.store(false);
+    if (state == AGENT_STATE_READY) label = g_handshake_armed.load() ? "KIN HOME\nWAITING MATCH" : "KIN HOME\nREADY";
+    if (state != AGENT_STATE_READY) { g_confirmed.store(false); g_handshake_armed.store(false); g_gesture_seen.store(false); }
     ESP_LOGI(kTag, "Agent_link state=%d", int(state));
     QueueUi(label);
 }
 
 void PushButtonEvent() {
     if (g_handshake_connected.load()) return;
-    if (!g_link_ready.load()) {
-        QueueUi("CONFIRM\nOFFLINE");
-        return;
-    }
-    const uint8_t payload[2] = {0, 1};  // button 0, press
+    if (!g_link_ready.load()) { QueueUi("KIN OFFLINE\nRECONNECTING"); return; }
+    if (!g_handshake_armed.load()) { QueueUi("KIN HOME\nNO ACTIVE MATCH"); return; }
+    if (g_confirmed.load()) { QueueUi("CONFIRMED\nSHAKE NOW"); return; }
+    const uint8_t payload[2] = {0, 1};
     const esp_err_t err = agent_link_push_event(AGENT_EVT_BUTTON, payload, sizeof(payload));
     ESP_LOGI(kTag, "confirm button: %s", esp_err_to_name(err));
-    if (err == ESP_OK) g_confirmed.store(true);
-    if (err == ESP_OK) g_last_interaction_ms.store(M5.millis());
-    QueueUi(err == ESP_OK ? "CONFIRMED\nSHAKE TOGETHER" : "CONFIRM\nOFFLINE");
+    if (err == ESP_OK) { g_confirmed.store(true); g_gesture_seen.store(false); g_last_interaction_ms.store(M5.millis()); }
+    QueueUi(err == ESP_OK ? "CONFIRMED\nSHAKE NOW" : "KIN OFFLINE\nRETRY G0");
 }
 
 void PushGestureEvent(float peak_g) {
-    if (g_handshake_connected.load() || !g_link_ready.load()) return;
+    if (!CanSendGesture(g_handshake_armed.load(), g_confirmed.load(), g_gesture_seen.load(), g_link_ready.load(), g_handshake_connected.load())) return;
     char json[80];
-    const int length = std::snprintf(json, sizeof(json),
-                                     "{\"kind\":\"handshake.gesture\",\"peak_g\":%.2f}", peak_g);
-    const esp_err_t err = agent_link_push_event(
-        AGENT_EVT_CUSTOM, reinterpret_cast<const uint8_t*>(json), static_cast<size_t>(length));
+    const int length = std::snprintf(json, sizeof(json), "{\"kind\":\"handshake.gesture\",\"peak_g\":%.2f}", peak_g);
+    const esp_err_t err = agent_link_push_event(AGENT_EVT_CUSTOM, reinterpret_cast<const uint8_t*>(json), static_cast<size_t>(length));
     ESP_LOGI(kTag, "gesture %.2fg: %s", peak_g, esp_err_to_name(err));
-    if (err == ESP_OK) {
-        // Audible acknowledgement: the user may not be able to read the screen
-        // while performing the shake gesture.
-        M5.Speaker.tone(1400, 120);
-        g_last_interaction_ms.store(M5.millis());
-        QueueUi(g_confirmed.load() ? "GESTURE SEEN\nWAITING PEER" : "GESTURE SEEN\nPRESS G0");
-    }
+    if (err == ESP_OK) { g_gesture_seen.store(true); M5.Speaker.tone(1400, 120); g_last_interaction_ms.store(M5.millis()); QueueUi("GESTURE SENT\nWAITING PEER"); }
 }
 
 void InputTask(void*) {
@@ -220,8 +218,9 @@ void InputTask(void*) {
             if (!g_handshake_connected.load() && g_confirmed.load() && last_interaction > 0 &&
                 now - last_interaction >= 30000) {
                 g_confirmed.store(false);
+                g_gesture_seen.store(false);
                 g_last_interaction_ms.store(0);
-                QueueUi("KIN READY\nTRY AGAIN");
+                QueueUi("MATCH READY\nPRESS G0");
             }
             if (gesture.candidate && now - last_gesture_ms >= kGestureCooldownMs) {
                 last_gesture_ms = now;

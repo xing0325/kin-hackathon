@@ -1,14 +1,30 @@
-## 2026-08-29 KIN logo refresh
+## 2026-08-29 Cardputer-Adv Text UI V0.3 实板刷写
 
-- Intro hero liquid mask now derives from the supplied KIN mark image; the top-left header uses the cropped mark as well.
-- Public fallback copy keeps `/brand/kin-logo-cropped.jpg` stable under GitHub Pages.
-- Verification: frontend tests `4 passed`; Vite build `107 modules transformed`.
+- 将 Product UI 恢复为可读文字优先界面，并保留 Agent_link、BLE、IMU、G0 确认、握手动作与声音反馈。
+- 新增握手状态门控：只有 `KIN READY` 后 G0 才会确认；确认后首次有效晃动才发送 gesture，重复晃动不重复上报；30 秒超时回到 `MATCH READY / PRESS G0`。
+- 固件版本 `0.3.0-text`；ESP-IDF 5.5.4 构建成功，app `0x13bd20`（69% 空间剩余）。
+- 已刷入当前响应设备 `NODE-7FAC`（MAC `50:78:7d:ce:7f:ac`），端口 `/dev/cu.usbmodem1101`；bootloader、应用、分区表均 `Hash of data verified.`。
+- Host tests: `GESTURE_DETECTOR_TEST_RESULT: 25 passed`；`HANDSHAKE_GATE_TEST_RESULT: 10 passed`。
 
-## 2026-08-29 Animated intro GitHub Pages
+## 2026-08-29 第二台 Cardputer-Adv Product UI 实板刷写
 
-- GitHub Pages workflow now builds the animated KIN intro from `apps/web` alongside the user demo.
-- Intro is published at `https://xing0325.github.io/kin-hackathon/brand/` with Vite base path and interactive Fluid Glass / wave-grid motion.
-- Verification: GitHub Actions run `33198527815` succeeded; intro URL returns HTTP 200 and title `KIN — Agents need kin`.
+- 新 Product UI 固件已刷入 `NODE-7FAE`（MAC `50:78:7d:ce:7f:ac`），端口 `/dev/cu.usbmodem1101`。
+- Bootloader、应用、Partition Table 三段均报告 `Hash of data verified.`，硬复位完成。
+- `/dev/cu.usbmodem000000011` 当前无响应，未对其执行写入。
+
+## 2026-08-29 Cardputer-Adv Product UI 实板刷写
+
+- 新 Product UI 固件已刷入 `NODE-A7B2`（MAC `50:78:7d:ce:a7:b2`），端口 `/dev/cu.usbmodem1101`。
+- esptool 三段写入均报告 `Hash of data verified.`，随后硬复位成功。
+- 启动日志确认 `board_M5CardputerADV`、`imu=1`、`speaker=1`、`mic=1`、`battery=100`，Agent_link 广播 `NODE-A7B2`，BLE Service C `0xFFC0` 正常。
+
+## 2026-08-29 Cardputer-Adv Product UI Phase 1
+
+- 新增 `firmware/cardputer-adv/main/product_ui.hpp`：固定数组 ParticleSystem、ember 色阶、AMBIENT/LISTENING/WORKING/RESULT/HANDSHAKE/CAMPFIRE/ERROR/CHARGING 状态。
+- `UiTask` 改为 30 Hz 非阻塞粒子渲染；业务回调仍通过原有 QueueUi/Agent_link 信号驱动。
+- 默认开机进入 Product Mode；G0 长按 3 秒切换 Debug Mode，保留原有 ASCII/文本 DrawUi。
+- 未修改 BLE/Wi‑Fi/Agent_link 协议、API 或数据库。
+- ESP-IDF 5.5.4 build 成功，app partition 剩余 69%；GestureDetector host test 25 passed。
 
 # STATUS.md
 

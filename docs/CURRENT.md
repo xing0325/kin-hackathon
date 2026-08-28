@@ -18,7 +18,7 @@ Discover → Understand → Context Handshake → Shared Context → Agent Help.
 
 ## Active implementation
 
-V0.11 release hardening is complete in code: EigenFlux can exchange trusted identities for signed HttpOnly KIN sessions; notifications are owner-scoped and acknowledged; API/worker deployment and operational probes are documented.
+V0.11 release hardening and the repeatable software candidate gate are complete. The final freeze is waiting only for both accepted Cardputer devices to be simultaneously powered and pass the recorded physical gesture/G0/display/tone gate.
 
 ## Constraints
 
@@ -29,4 +29,4 @@ V0.11 release hardening is complete in code: EigenFlux can exchange trusted iden
 
 ## Next release
 
-Complete one final physical two-Cardputer acceptance pass, then freeze the Hackathon Demo Candidate. No new product page is required before that acceptance.
+Power both accepted Cardputer devices, run the final physical acceptance watcher, then freeze and tag the Hackathon Demo Candidate. No new product page is required before that acceptance.

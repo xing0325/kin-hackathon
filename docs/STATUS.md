@@ -1,5 +1,18 @@
 # STATUS.md
 
+## 2026-08-28 Demo Candidate release gate
+
+- 新增 `tools/verify-demo-candidate.sh`，单命令串联 FastAPI、用户端、品牌页、Conversation Collector、Experience Bridge、Agent_link Relay、TiDB migration plan 和 ESP-IDF 5.5.4 firmware build。
+- 真实运行结果 `DEMO_CANDIDATE_SOFTWARE_RESULT PASS`：API `16`、用户端 `21`、Collector `6`、品牌页 `4`、Relay `8`、Bridge `1`，migrations `17`。
+- 固件重建成功：`node_cardputer_adv.bin` `1293072` bytes，SHA-256 `cdfbae6fe1d40edd9aae7b77f772fdb3e165af039cce6c164353879b8502cad2`，app partition 剩余 `69%`。
+- 新增 `tools/verify-cardputer-acceptance.py`，轮询 trusted Agent_link session，只在 `connected` 且已生成 Relationship 时返回 PASS；本地双设备 wire-event 集成验证已通过。
+- 新增 `docs/DEMO_CANDIDATE.md`，固定 software gate、双机 BLE/gesture/G0/screen/tone 实物 gate 和冻结记录。
+- 本次实物预检仅观测到一个 USB serial 设备，BLE 扫描 60 秒内未观测到 `NODE-A7B2` / `NODE-7FAE`；因此软件 gate 已通过，最终实物 gate 保持 `PENDING`，尚未标记冻结。
+
+Next action:
+
+- 两台 Cardputer-Adv 同时上电并广播后，运行 `tools/run-cardputer-demo.sh` 和 acceptance watcher，通过后创建 Demo Candidate tag。
+
 ## 2026-08-28 GitHub Pages team handoff
 
 - 已将当前 KIN 完整源码方案整理为公开单仓库 `xing0325/kin-hackathon`，包含用户端、FastAPI、EigenFlux/KIN Core、Cardputer 固件、Agent_link Relay、Conversation Collector、TiDB migrations 和交接文档。

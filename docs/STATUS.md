@@ -1,5 +1,27 @@
 # STATUS.md
 
+## 2026-08-28 Cardputer-Adv IMU 采样与诊断链路修复
+
+What changed:
+
+- `InputTask` 不再把 `M5.Imu.getAccel()` 的“本次是否刷新”返回值当成“样本是否有效”条件；`M5.update()` 刷新后仍会处理缓存向量。
+- 新增可独立测试的 `GestureDetector`，候选条件改为 `magnitude >= 1.45g` 或相邻向量差 `delta >= 0.55g`，保留 800 ms cooldown。
+- macOS Relay 新增可选 `NODE_LOG_IMU=1` 实时诊断，并修正 Agent_link `AGENT_VAL_VEC3` 的 wire value 为 5。
+
+What is verified:
+
+- Host gesture test: `GESTURE_DETECTOR_TEST_RESULT: 25 passed`.
+- Relay tests: protocol 4 passed, vector reading 3 passed, downlink 4 passed.
+- ESP-IDF 5.5.4 build 成功；固件 SHA256 `97b093b2f80c755f59642b60c3d40abf32800ffed439c8bb964bd08f50614bf0`，1,293,232 bytes，app partition 剩余 69%。
+- 修复固件已写入 `NODE-7FAE` (`50:78:7d:ce:7f:ac`)，esptool 对所有写入段均报告 `Hash of data verified.`
+- 同一 Relay 会话中，修复后的 `NODE-7FAE` 稳定上报约 2 Hz BMI270 向量（静置 magnitude 约 1.013g）；未更新的 `NODE-A7B2` 没有上报该遥测，定位与修复分支得到实板 A/B 证据。
+
+What remains:
+
+- 修复固件已同样写入 `NODE-A7B2` (`50:78:7d:ce:a7:b0`)，所有写入段 hash 校验通过。
+- 双机实物验收通过：两台均上报 BMI270 向量、产生 `handshake.gesture`、G0 确认、播放短音，并接收 `KIN CONNECTED / CONTEXT SAVED`。
+- 验收结果：`PHYSICAL_GATE_RESULT PASS match_id=mat_85424b017eb62862 relationship_id=rel_1df4141686e526ae devices=2`。
+
 ## 2026-08-28 Demo Candidate release gate
 
 - 新增 `tools/verify-demo-candidate.sh`，单命令串联 FastAPI、用户端、品牌页、Conversation Collector、Experience Bridge、Agent_link Relay、TiDB migration plan 和 ESP-IDF 5.5.4 firmware build。

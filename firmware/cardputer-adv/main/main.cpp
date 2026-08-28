@@ -5,6 +5,7 @@
 
 #include <M5Unified.h>
 #include "agent_link.h"
+#include "gesture_detector.hpp"
 #include "esp_err.h"
 #include "esp_log.h"
 #include "esp_mac.h"
@@ -19,7 +20,6 @@ constexpr char kTag[] = "node.cardputer";
 constexpr char kFirmwareVersion[] = "0.2.0";
 constexpr size_t kUiTextBytes = 192;
 constexpr size_t kSpeakerBufferBytes = 16 * 1024;
-constexpr float kGestureThresholdG = 1.85f;
 constexpr uint32_t kGestureCooldownMs = 1500;
 constexpr uint32_t kTelemetryIntervalMs = 500;
 
@@ -202,13 +202,19 @@ void PushGestureEvent(float peak_g) {
 void InputTask(void*) {
     uint32_t last_gesture_ms = 0;
     uint32_t last_telemetry_ms = 0;
+    GestureDetector gesture_detector;
     while (true) {
         M5.update();
         if (M5.BtnA.wasPressed()) PushButtonEvent();
 
         float ax = 0, ay = 0, az = 0;
-        if (M5.Imu.isEnabled() && M5.Imu.getAccel(&ax, &ay, &az)) {
-            const float magnitude = std::sqrt(ax * ax + ay * ay + az * az);
+        if (M5.Imu.isEnabled()) {
+            // getAccel() returns whether this call refreshed the sensor, not
+            // whether the cached sample is usable. M5.update() may have
+            // refreshed it immediately before this call, so always process
+            // the returned cached vector.
+            M5.Imu.getAccel(&ax, &ay, &az);
+            const GestureSample gesture = gesture_detector.update(ax, ay, az);
             const uint32_t now = M5.millis();
             const uint32_t last_interaction = g_last_interaction_ms.load();
             if (!g_handshake_connected.load() && g_confirmed.load() && last_interaction > 0 &&
@@ -217,9 +223,9 @@ void InputTask(void*) {
                 g_last_interaction_ms.store(0);
                 QueueUi("KIN READY\nTRY AGAIN");
             }
-            if (magnitude >= kGestureThresholdG && now - last_gesture_ms >= kGestureCooldownMs) {
+            if (gesture.candidate && now - last_gesture_ms >= kGestureCooldownMs) {
                 last_gesture_ms = now;
-                PushGestureEvent(magnitude);
+                PushGestureEvent(gesture.magnitude);
             }
             if (now - last_telemetry_ms >= kTelemetryIntervalMs) {
                 last_telemetry_ms = now;

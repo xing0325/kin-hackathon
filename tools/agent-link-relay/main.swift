@@ -11,6 +11,7 @@ struct RelayConfiguration {
     let agentToken: String
     let matchID: String
     let proofNonce: String
+    let logIMU: Bool
 
     static func fromEnvironment() -> RelayConfiguration {
         let env = ProcessInfo.processInfo.environment
@@ -23,7 +24,10 @@ struct RelayConfiguration {
         let token = env["NODE_AGENT_TOKEN"] ?? "change-me"
         let nonce = env["NODE_PROOF_NONCE"] ?? "cardputer-live-proof"
         precondition(nonce.count >= 8, "NODE_PROOF_NONCE must contain at least 8 characters")
-        return RelayConfiguration(apiBase: base, agentToken: token, matchID: matchID, proofNonce: nonce)
+        return RelayConfiguration(
+            apiBase: base, agentToken: token, matchID: matchID, proofNonce: nonce,
+            logIMU: env["NODE_LOG_IMU"] == "1"
+        )
     }
 }
 
@@ -111,9 +115,11 @@ final class AgentLinkRelay: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     private var commandChannels: [UUID: CBCharacteristic] = [:]
     private var commandSequence: UInt8 = 1
     private var connectedFeedbackSent = false
+    private let logIMU: Bool
 
     init(configuration: RelayConfiguration) {
         self.gateway = GatewayClient(config: configuration)
+        self.logIMU = configuration.logIMU
         super.init()
         self.central = CBCentralManager(delegate: self, queue: nil)
     }
@@ -253,6 +259,14 @@ final class AgentLinkRelay: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         guard characteristic.uuid == characteristicEvents, let data = characteristic.value else { return }
         do {
             let frame = try parseAgentLinkEvent(data)
+            if frame.eventID == 0x19 {
+                if logIMU, let reading = parseVectorReading(frame.payload), reading.endpoint == "imu_accel" {
+                    let magnitude = sqrt(reading.x * reading.x + reading.y * reading.y + reading.z * reading.z)
+                    print(String(format: "IMU_READING: %@ x=%.3f y=%.3f z=%.3f magnitude=%.3f",
+                                 name, reading.x, reading.y, reading.z, magnitude))
+                }
+                return
+            }
             guard frame.eventID == 1 || frame.eventID == 100 else {
                 return
             }

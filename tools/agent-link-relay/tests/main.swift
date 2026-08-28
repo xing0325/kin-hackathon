@@ -33,6 +33,19 @@ do {
 
 print("PROTOCOL_TEST_RESULT: 4 passed")
 
+var vectorPayload = Data([9])
+vectorPayload.append(Data("imu_accel".utf8))
+vectorPayload.append(5)
+for value in [Float(0.25), Float(-0.5), Float(1.75)] {
+    var bits = value.bitPattern.littleEndian
+    withUnsafeBytes(of: &bits) { vectorPayload.append(contentsOf: $0) }
+}
+let vector = parseVectorReading(vectorPayload)
+expect(vector?.endpoint == "imu_accel", "vector endpoint")
+expect(vector?.x == 0.25 && vector?.y == -0.5 && vector?.z == 1.75, "vector values")
+expect(parseVectorReading(Data([0])) == nil, "malformed vector rejected")
+print("VECTOR_READING_TEST_RESULT: 3 passed")
+
 let connected = buildIoActuateCommand(
     endpoint: "screen0",
     arguments: Data("KIN CONNECTED\nCONTEXT SAVED".utf8),

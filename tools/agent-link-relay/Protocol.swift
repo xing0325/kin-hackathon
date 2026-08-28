@@ -7,6 +7,13 @@ struct AgentLinkFrame: Equatable {
     let payload: Data
 }
 
+struct AgentLinkVectorReading: Equatable {
+    let endpoint: String
+    let x: Float
+    let y: Float
+    let z: Float
+}
+
 enum AgentLinkFrameError: Error, CustomStringConvertible {
     case tooShort
     case unsupportedVersion(UInt8)
@@ -39,6 +46,29 @@ func parseAgentLinkEvent(_ data: Data) throws -> AgentLinkFrame {
         eventID: bytes[2],
         sequence: bytes[3],
         payload: data.subdata(in: 6..<data.count)
+    )
+}
+
+func parseVectorReading(_ payload: Data) -> AgentLinkVectorReading? {
+    let bytes = [UInt8](payload)
+    guard let idLength = bytes.first.map(Int.init), idLength > 0,
+          bytes.count == 1 + idLength + 1 + 12 else { return nil }
+    let idStart = 1
+    let idEnd = idStart + idLength
+    // Agent_link's agent_val_t is zero-based; AGENT_VAL_VEC3 is 5.
+    guard let endpoint = String(bytes: bytes[idStart..<idEnd], encoding: .utf8),
+          bytes[idEnd] == 5 else { return nil }
+    func float(at offset: Int) -> Float {
+        let bits = UInt32(bytes[offset]) | UInt32(bytes[offset + 1]) << 8 |
+            UInt32(bytes[offset + 2]) << 16 | UInt32(bytes[offset + 3]) << 24
+        return Float(bitPattern: bits)
+    }
+    let valueStart = idEnd + 1
+    return AgentLinkVectorReading(
+        endpoint: endpoint,
+        x: float(at: valueStart),
+        y: float(at: valueStart + 4),
+        z: float(at: valueStart + 8)
     )
 }
 

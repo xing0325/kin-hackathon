@@ -19,8 +19,8 @@ token may be supplied as `VITE_KIN_API_TOKEN`.
 
 The shared GitHub Pages build is published in deterministic demo mode. Vite
 derives the CI base path from `GITHUB_REPOSITORY`, while local development
-stays at `/`. `BrowserRouter` reads the same build base, so teammates can work
-locally or from a fork without adding repository prefixes to application routes.
+stays at `/`. Pages enables the hash router so every shared route returns HTTP
+200; local and real deployments keep clean `BrowserRouter` URLs.
 
 ## Implemented pages
 

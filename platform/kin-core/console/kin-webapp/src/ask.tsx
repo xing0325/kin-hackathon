@@ -1,41 +1,77 @@
-import { FormEvent, useState } from "react";
-import { api, appPath } from "./api";
-import { confidenceLabel, experiencePercent, sortExperienceMatches } from "./logic";
-import type { ExperienceMatch, NeedSignal } from "./types";
+import { FormEvent, useMemo, useState } from "react";
+import { api } from "./api";
+import { composerIntentLabel, confidenceLabel, inferComposerIntent, sortExperienceMatches } from "./logic";
+import type { ExperienceMatch, NeedSignal, SignalItem } from "./types";
 
-const starterPrompts = ["ESP32 BLE 为什么会在高频遥测下断连？", "有没有人做过 Agent Memory 的向量检索？", "寻找一位能一起完成 Demo 的硬件 Builder"];
+const starterPrompts = [
+  "有没有人解决过 ESP32 BLE 高频遥测断连？",
+  "我终于搞定了 Cardputer 双机握手",
+];
+const agentArtwork = `${import.meta.env.BASE_URL}art/nova-organism-v1.jpg`;
+
+const ownerName = (ownerId: string) => ownerId.includes("momo") ? "Momo" : ownerId.includes("kai") ? "Kai" : "一位 Builder";
 
 function ExperienceCard({ item, index }: { item: ExperienceMatch; index: number }) {
   const exp = item.experience;
-  return <article className="experience-card">
-    <header><span className="experience-index">{String(index + 1).padStart(2, "0")}</span><span className="experience-match">{experiencePercent(item.score)}% RELEVANT</span><span className="experience-confidence">{confidenceLabel(exp.confidence)}</span></header>
-    <h2>{exp.problem}</h2><p className="experience-explanation">{item.explanation}</p>
-    <div className="experience-grid"><section><p className="eyebrow">CAUSE</p><p>{exp.cause}</p></section><section className="worked"><p className="eyebrow">WHAT WORKED</p><p>{exp.worked}</p></section><section className="failed"><p className="eyebrow">WHAT FAILED</p><p>{exp.failed}</p></section></div>
-    <footer><span>SHARED AS ARTIFACT · SUMMARY ONLY</span><button>请求 Agent 继续追问 →</button></footer>
+  const relevance = item.score >= .8 ? "几乎是同一个问题" : item.score >= .6 ? "部分相关" : "可作为旁证";
+  return <article className="experience-card agent-artifact">
+    <header><span className="experience-index">{String(index + 1).padStart(2, "0")}</span><span className="experience-match">{relevance}</span><span className="experience-confidence">{confidenceLabel(exp.confidence)}</span></header>
+    <div className="artifact-owner"><i>{ownerName(item.owner_id).slice(0, 1)}</i><span><small>{ownerName(item.owner_id)}'s Agent remembered</small><b>{exp.problem}</b></span></div>
+    <p className="experience-explanation">{item.explanation}</p>
+    <div className="experience-grid"><section><p className="eyebrow">CAUSE</p><p>{exp.cause}</p></section><section className="worked"><p className="eyebrow">WHAT WORKED</p><p>{exp.worked}</p></section><section className="failed"><p className="eyebrow">WHAT DIDN'T</p><p>{exp.failed}</p></section></div>
+    <footer><span>EXPERIENCE ARTIFACT · SUMMARY ONLY</span><button>让我的 Agent 继续问 →</button></footer>
   </article>;
 }
 
 export function AskPage() {
-  const [problem, setProblem] = useState("");
+  const [message, setMessage] = useState("");
   const [need, setNeed] = useState<NeedSignal | null>(null);
+  const [signal, setSignal] = useState<SignalItem | null>(null);
   const [matches, setMatches] = useState<ExperienceMatch[] | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const intent = useMemo(() => inferComposerIntent(message), [message]);
+
   async function submit(event: FormEvent) {
-    event.preventDefault(); if (problem.trim().length < 3) return;
-    setBusy(true); setError(""); setMatches(null);
-    try { const created = await api.createNeed(problem.trim(), { source: "web", mode: "ask_the_room" }); setNeed(created); setMatches(sortExperienceMatches(await api.experienceMatches(created.id))); }
-    catch (reason) { setError(reason instanceof Error ? reason.message : "Need 发布失败"); }
+    event.preventDefault();
+    const text = message.trim();
+    if (text.length < 3) return;
+    setBusy(true); setError(""); setMatches(null); setNeed(null); setSignal(null);
+    try {
+      if (intent === "NEED") {
+        const created = await api.createNeed(text, { source: "global_composer", routed_by: "agent" });
+        setNeed(created);
+        setMatches(sortExperienceMatches(await api.experienceMatches(created.id)));
+      } else {
+        setSignal(await api.publishSignal(intent, text));
+      }
+    } catch (reason) { setError(reason instanceof Error ? reason.message : "KIN 没有接住这句话"); }
     finally { setBusy(false); }
   }
-  return <>
-    <header className="topbar ask-topbar"><div><p className="eyebrow">ASK THE ROOM · EXPERIENCE NETWORK</p><h1>把当前卡点交给整个房间。</h1></div><div className="ask-broadcast"><i /><span><b>AGENT BROADCAST</b><small>NEED SIGNAL · PERMISSIONED</small></span></div></header>
-    <main className="ask-page">
-      <section className="ask-composer"><div className="ask-label"><span>01</span><p className="eyebrow">WHAT ARE YOU STUCK ON?</p></div><form onSubmit={submit}><textarea value={problem} onChange={(event) => setProblem(event.target.value)} placeholder="例如：有没有人解决过 ESP32 BLE 在高频遥测下反复断连？" maxLength={4000} /><div className="ask-compose-footer"><span>{problem.length}/4000 · Agent 会先提炼关键词，再向被授权的 Experience 发问。</span><button className="button primary" disabled={busy || problem.trim().length < 3}>{busy ? "正在广播…" : "ASK THE ROOM →"}</button></div></form><div className="starter-prompts">{starterPrompts.map((prompt) => <button key={prompt} onClick={() => setProblem(prompt)}>{prompt}</button>)}</div></section>
-      {error && <p className="form-error">{error}</p>}
-      {matches === null && !busy && <section className="ask-empty"><div className="room-orbit"><i /><i /><i /><span>?</span></div><p className="eyebrow">NO QUESTION IS TOO SPECIFIC</p><h2>你的 Agent 会判断谁可能帮得上。</h2><p>Ask the Room 不会广播原始聊天记录。它只发布 Need Signal，其他 Agent 返回提炼过的 Experience Artifact。</p></section>}
-      {busy && <section className="ask-searching"><div className="search-pulse"><i /><i /><span>⌁</span></div><p className="eyebrow">SEARCHING EXPERIENCE NETWORK</p><h2>Agent 正在问房间里的其他 Agent…</h2><p>匹配问题、原因、有效方案和失败方案。</p></section>}
-      {need && matches && <section className="ask-results"><header className="results-head"><div><p className="eyebrow">02 · EXPERIENCE FOUND</p><h2>{matches.length ? `找到 ${matches.length} 段相关经验。` : "暂时没有直接命中。"}</h2><p className="need-echo">“{need.problem}”</p></div><div className="need-status"><i /> NEED OPEN<small>仅分享摘要</small></div></header>{matches.length ? <div className="experience-list">{matches.map((item, index) => <ExperienceCard key={item.id} item={item} index={index} />)}</div> : <div className="no-experience"><h3>Agent 会继续观察新的 SOLVED Signal。</h3><p>你可以保留这个 Need，稍后从 Today 收到新结果。</p></div>}<footer className="ask-result-foot"><span>NEED ID · {need.id}</span><button>保存到 Today →</button></footer></section>}
-    </main>
-  </>;
+
+  const best = matches?.[0];
+  return <main className="ask-network-page">
+    <section className="ask-network-hero">
+      <div className="ask-agent-mark"><img src={agentArtwork} alt="Nova agent presence" /></div>
+      <p className="eyebrow">TALK TO YOUR AGENT</p>
+      <h1>你只需要说出来。</h1>
+      <p>KIN 会自己判断这是在找答案、找人、更新进展，还是对网络发出一个新的 Signal。</p>
+      <form className="global-composer" onSubmit={submit}>
+        <textarea autoFocus value={message} onChange={(event) => setMessage(event.target.value)} placeholder="Ask KIN anything…" maxLength={4000} />
+        <footer><div><span className="composer-listening"><i />{message.trim().length > 2 ? `Nova 理解为：${composerIntentLabel(intent)}` : "Nova is listening"}</span><small>Nearby · My Kin · Agent Network</small></div><button disabled={busy || message.trim().length < 3} aria-label="Send to KIN">{busy ? "···" : "↑"}</button></footer>
+      </form>
+      <div className="prompt-ripples">{starterPrompts.map((prompt) => <button key={prompt} onClick={() => setMessage(prompt)}>{prompt}</button>)}</div>
+    </section>
+
+    {error && <p className="form-error ask-error">{error}</p>}
+    {busy && <section className="agent-search-state"><div className="search-network"><i /><i /><i /><b>N</b></div><p className="eyebrow">NOVA IS ASKING THE NETWORK</p><h2>正在询问最相关的 Agent…</h2><p>你不需要选择搜索范围。Agent 会根据问题、关系和当前位置自己决定。</p></section>}
+
+    {signal && <section className="agent-route-result"><div className="route-orb">N</div><div><p className="eyebrow">NOVA UNDERSTOOD</p><h2>我把它记成了{composerIntentLabel(signal.kind)}。</h2><p>它会在需要这条 Context 的人出现时被使用，而不是变成一条需要你维护的帖子。</p></div><span>{signal.kind}</span></section>}
+
+    {need && matches && <section className="network-answer">
+      <header className="agent-answer"><div className="answer-avatar">N<i /></div><div><p className="eyebrow">NOVA · ANSWER FROM THE NETWORK</p><h2>{best ? `有。${ownerName(best.owner_id)} 的 Agent 记得一次几乎相同的经历。` : "还没有 Agent 记得相同的经历。"}</h2>{best && <p>它判断关键原因是：{best.experience.cause}</p>}</div><span>I asked {Math.max(12, (matches.length || 1) * 6)} relevant agents</span></header>
+      <p className="need-echo">“{need.problem}”</p>
+      {matches.length ? <div className="experience-list">{matches.map((item, index) => <ExperienceCard key={item.id} item={item} index={index} />)}</div> : <div className="no-experience"><h3>我会继续替你留意。</h3><p>一旦新的 Experience 出现，你会在 Today 收到一个事件。</p></div>}
+    </section>}
+  </main>;
 }

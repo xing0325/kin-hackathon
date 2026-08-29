@@ -23,16 +23,19 @@ EigenFlux services, or account credentials.
 | Route | Primary source | Product surface |
 | --- | --- | --- |
 | `/login`, `/onboarding`, `/today` | `src/App.tsx` | Entry, identity setup, proactive home |
-| `/radar`, `/radar/:matchId` | `src/radar.tsx` | Builder Radar, Why You Match, Handshake entry |
-| `/ask` | `src/ask.tsx` | Ask the Room and Experience results |
+| `/radar`, `/radar/:matchId` | `src/radar.tsx` | `KIN → Nearby`, Why Now, fullscreen Handshake transition |
+| `/ask` | `src/ask.tsx` | Global Agent composer, automatic intent routing, Experience answers |
 | `/kin`, `/kin/:relationshipId` | `src/kin.tsx` | Relationship Memory and Shared Context |
-| `/me` | `src/me.tsx` | Builder Profile and Context Studio |
-| `/campfire` | `src/campfire.tsx` | Team formation and member confirmation |
-| `/signals` | `src/signals.tsx` | NEED/BUILDING/SOLVED/DISCOVERED/AVAILABLE feed |
+| `/me` | `src/me.tsx` | Builder identity, AI life, and secondary Context Studio |
+| `/campfire` | `src/campfire.tsx` | Today-triggered team proposal and member confirmation |
+| `/signals` | redirect to `/ask` | Signal ontology is internal; the Agent routes natural language |
 
 Shared styling is in `src/style.css`. API adapters are in `src/api.ts`, types in
 `src/types.ts`, deterministic content in `src/fixtures.ts`, and pure interaction
 rules in `src/logic.ts`.
+
+Primary navigation is intentionally limited to `Today / Ask / Kin / Me`.
+Radar and Campfire remain deep product capabilities, not top-level destinations.
 
 ## Data modes
 

@@ -9,10 +9,13 @@ const field = new FluidGlassField(
 );
 
 document.body.classList.add("hero-visible");
+const heroVideo = document.querySelector(".hero-product-video");
 const heroObserver = new IntersectionObserver(([entry]) => {
   const active = entry.isIntersecting;
   document.body.classList.toggle("hero-visible", active);
   field.setActive(active);
+  if (active) heroVideo?.play().catch(() => {});
+  else heroVideo?.pause();
 }, { threshold: 0.05 });
 heroObserver.observe(document.querySelector("#hero"));
 
@@ -22,7 +25,7 @@ const revealObserver = new IntersectionObserver((entries) => {
   }
 }, { threshold: 0.14 });
 
-document.querySelectorAll("section > *").forEach((element) => {
+document.querySelectorAll("section > *:not([data-no-reveal])").forEach((element) => {
   element.classList.add("reveal");
   revealObserver.observe(element);
 });
@@ -46,3 +49,12 @@ const animationObserver = new IntersectionObserver((entries) => {
   }
 }, { threshold: 0.15 });
 animationObserver.observe(document.querySelector("#wave-grid"));
+
+const waveCanvas = document.querySelector("#wave-grid-canvas");
+const waveState = document.querySelector("#wave-grid-state");
+let waveStateTimer;
+waveCanvas.addEventListener("pointermove", () => {
+  waveState.textContent = "RESPONDING";
+  clearTimeout(waveStateTimer);
+  waveStateTimer = setTimeout(() => { waveState.textContent = "LISTENING"; }, 1200);
+}, { passive: true });

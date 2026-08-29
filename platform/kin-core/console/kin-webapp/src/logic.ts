@@ -1,4 +1,4 @@
-import type { AttentionItem, CampfireRoom, ExperienceCandidate, ExperienceMatch, ProfileFieldState, RadarMatch, Relationship, TodayData } from "./types";
+import type { AttentionItem, CampfireRoom, ExperienceCandidate, ExperienceMatch, ProfileFieldState, RadarMatch, Relationship, SignalKind, TodayData } from "./types";
 
 export const CATEGORY_LABELS: Record<string, string> = {
   match_found: "MATCH",
@@ -53,6 +53,23 @@ export function experiencePercent(score: number): number {
 
 export function sortExperienceMatches(matches: ExperienceMatch[]): ExperienceMatch[] {
   return [...matches].sort((a, b) => b.score - a.score);
+}
+
+export function inferComposerIntent(input: string): SignalKind {
+  const value = input.trim().toLocaleLowerCase();
+  if (/(?:搞定|解决了|已完成|刚完成|fixed|solved|shipped)/i.test(value)) return "SOLVED";
+  if (/(?:正在|我在做|开始做|正做|building|working on)/i.test(value)) return "BUILDING";
+  if (/(?:可以帮|愿意帮|有空|可用|available)/i.test(value)) return "AVAILABLE";
+  if (/(?:我发现|刚发现|学到|discovered|learned)/i.test(value)) return "DISCOVERED";
+  return "NEED";
+}
+
+export function composerIntentLabel(intent: SignalKind): string {
+  if (intent === "SOLVED") return "一段刚刚发生的解法";
+  if (intent === "BUILDING") return "你正在推进的事";
+  if (intent === "AVAILABLE") return "你可以提供的帮助";
+  if (intent === "DISCOVERED") return "一个值得记住的发现";
+  return "一个需要 Agent 网络帮忙的问题";
 }
 
 export function confidenceLabel(confidence: number): string {

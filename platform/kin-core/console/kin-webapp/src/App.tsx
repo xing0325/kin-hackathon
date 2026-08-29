@@ -2,7 +2,7 @@ import { FormEvent, ReactNode, useEffect, useMemo, useRef, useState } from "reac
 import { Link, Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { api, appPath, demoMode } from "./api";
 import { emptyDraft } from "./fixtures";
-import { attentionCount, categoryLabel, observationCopy, relativeTime } from "./logic";
+import { attentionCount, observationCopy, relativeTime } from "./logic";
 import { MatchDetailPage, RadarPage } from "./radar";
 import { AskPage } from "./ask";
 import { KinDetailPage, KinPage } from "./kin";
@@ -12,7 +12,8 @@ import type { AttentionItem, NotificationItem, OnboardingDraft, SessionData, Tod
 import { connectKinDevices } from "./mobileBle";
 import type { AwaitedKinDevices } from "./mobileBle";
 
-const Icon = ({ children }: { children: ReactNode }) => <span className="nav-icon" aria-hidden="true">{children}</span>;
+const agentArtwork = `${import.meta.env.BASE_URL}art/nova-organism-v1.jpg`;
+const Icon = ({ name }: { name: string }) => <span className={`nav-icon nav-icon-${name}`} aria-hidden="true"><i /><i /></span>;
 
 function LoginPage() {
   const navigate = useNavigate();
@@ -128,31 +129,34 @@ function OnboardingPage() {
   </main>;
 }
 
-function AttentionCard({ item, context }: { item: AttentionItem; context?: TodayData["agent_contexts"][string] }) {
-  return <article className={`attention-card ${item.category}`}>
-    <div className="card-meta"><span>{categoryLabel(item.category)}</span><time>{relativeTime(item.created_at)}</time></div>
-    <h3>{item.title}</h3><p>{item.body}</p>
-    {context && <div className="source-person"><div className="avatar">{context.identity_assertion.display_name.slice(0, 1)}</div><span><b>{context.identity_assertion.display_name}</b><small>{context.card_summary.human_description}</small></span></div>}
-    <blockquote>{item.recommendation}</blockquote>
-    <div className="card-actions">{item.actions.map((action, index) => action.href
-      ? <Link className={action.kind === "primary" || index === 0 ? "primary" : ""} key={action.key} to={appPath(action.href)}>{action.label}</Link>
-      : <button className={action.kind === "primary" || index === 0 ? "primary" : ""} key={action.key}>{action.label}</button>)}</div>
-  </article>;
-}
-
 function AppShell({ session, children, badge = 0 }: { session: SessionData; children: ReactNode; badge?: number }) {
   const location = useLocation();
   const nav = [
-    ["/today", "⌁", "今天"], ["/radar", "◎", "雷达"], ["/ask", "+", "动态与求助"], ["/kin", "⋈", "关系图谱"], ["/campfire", "△", "小组"], ["/me", "◉", "我的"],
+    ["/today", "today", "Today"], ["/ask", "ask", "Ask"], ["/kin", "kin", "Kin"], ["/me", "me", "Me"],
   ];
+  const isActive = (path: string) => path === "/kin"
+    ? location.pathname.startsWith("/kin") || location.pathname.startsWith("/radar")
+    : location.pathname === path || (path !== "/today" && location.pathname.startsWith(`${path}/`));
   return <div className="app-shell">
     <aside>
       <Link className="brand" to={appPath("/today")}><span>K</span>KIN</Link>
-      <nav>{nav.map(([path, icon, label]) => <Link className={location.pathname === path || (path !== "/today" && location.pathname.startsWith(`${path}/`)) ? "active" : ""} to={appPath(path)} key={path}><Icon>{icon}</Icon><span>{label}</span>{label === "今天" && badge > 0 && <b>{badge}</b>}</Link>)}</nav>
-      <div className="runtime-state"><i /><span><b>{session.agent_name}</b><small>{session.runtime || "runtime pending"}</small></span></div>
+      <nav>{nav.map(([path, icon, label]) => <Link className={`${isActive(path) ? "active" : ""} ${path === "/ask" ? "composer-link" : ""}`} to={appPath(path)} key={path}><Icon name={icon} /><span>{label}</span>{label === "Today" && badge > 0 && <b>{badge}</b>}</Link>)}</nav>
+      <div className="runtime-state"><i /><span><b>{session.agent_name} is listening</b><small>{session.runtime || "runtime pending"}</small></span></div>
     </aside>
     <div className="app-content">{children}</div>
   </div>;
+}
+
+function EventCard({ item, context, quiet = false }: { item: AttentionItem; context?: TodayData["agent_contexts"][string]; quiet?: boolean }) {
+  const person = context?.identity_assertion.display_name;
+  const label = item.category === "match_found" ? "YOU SHOULD MEET" : item.category === "experience_found" ? "AN AGENT FOUND AN ANSWER" : item.category === "follow_up" ? "A RELATIONSHIP NEEDS YOU" : "YOU CAN HELP";
+  return <article className={`life-event ${quiet ? "quiet" : ""} ${item.category}`}>
+    <div className="life-event-meta"><span><i />{label}</span><time>{relativeTime(item.created_at)}</time></div>
+    <div className="life-event-body">{person && <div className="life-avatar">{person.slice(0, 1)}<i /></div>}<div><h3>{person && item.category === "match_found" ? person : item.title}</h3><p>{item.body}</p><strong>{item.recommendation}</strong></div></div>
+    <div className="life-event-actions">{item.actions.map((action, index) => action.href
+      ? <Link className={index === 0 ? "primary" : ""} key={action.key} to={appPath(action.href)}>{action.label} <span>→</span></Link>
+      : <button className={index === 0 ? "primary" : ""} key={action.key}>{action.label}</button>)}</div>
+  </article>;
 }
 
 function TodayPage({ session }: { session: SessionData }) {
@@ -167,10 +171,6 @@ function TodayPage({ session }: { session: SessionData }) {
     api.proactive().then(setProactive).catch(() => setProactive([]));
     api.notifications().then(setNotifications).catch(() => setNotifications([]));
   }, []);
-  async function markRead(item: NotificationItem) {
-    await api.readNotification(item.id);
-    setNotifications((current) => current.map((entry) => entry.id === item.id ? { ...entry, read_at: new Date().toISOString() } : entry));
-  }
   const openCount = useMemo(() => today ? attentionCount(today) : 0, [today]);
   if (error) return <AppShell session={session}><div className="state-page"><h2>Today 暂时没有加载</h2><p>{error}</p></div></AppShell>;
   if (!today) return <AppShell session={session}><div className="loading-screen">Agent 正在整理今天值得你注意的事…</div></AppShell>;
@@ -183,30 +183,24 @@ function TodayPage({ session }: { session: SessionData }) {
       setBleStatus(`${devices.names.join(" + ")} · 已连接，请两台按 1`);
     } catch (reason) { setBleStatus(reason instanceof Error ? reason.message : "蓝牙连接失败"); }
   }
+  const primary = today.focus_items[0];
+  const primaryContext = primary?.source_agent_id ? today.agent_contexts[primary.source_agent_id] : undefined;
+  const secondary = [...today.focus_items.slice(1), ...today.participation_items].slice(0, 2);
   return <AppShell session={session} badge={openCount + unreadCount}>
-    <header className="topbar"><div><p className="eyebrow">{today.day} · SHANGHAI</p><h1>今天，{session.agent_name} 发现了这些。</h1></div><div className={`agent-online ${today.observation.connected ? "connected" : ""}`}><i /><span>{observationCopy(today)}<small>LAST SCAN · {relativeTime(today.observation.last_scan_at)}</small></span></div></header>
-    <main className="today-layout">
-      <section className="today-main">
-        <div className="section-heading"><span>需要你关注</span><b>{today.focus_items.length}</b></div>
-        <div className="attention-grid">{today.focus_items.map((item) => <AttentionCard key={item.attention_id} item={item} context={item.source_agent_id ? today.agent_contexts[item.source_agent_id] : undefined} />)}</div>
-        <div className="section-heading lower"><span>继续推进</span><b>{today.participation_items.length}</b></div>
-        <div className="attention-grid compact">{today.participation_items.map((item) => <AttentionCard key={item.attention_id} item={item} context={item.source_agent_id ? today.agent_contexts[item.source_agent_id] : undefined} />)}</div>
+    <header className="topbar today-topbar"><div><p className="eyebrow">{today.day} · SHANGHAI</p><h1>Good morning, Oscar.</h1></div><div className={`agent-online ${today.observation.connected ? "connected" : ""}`}><i /><span>{observationCopy(today)}<small>{relativeTime(today.observation.last_scan_at)} updated</small></span></div></header>
+    <main className="life-today">
+      <section className="agent-presence">
+        <div className="kin-life"><img src={agentArtwork} alt="Nova agent presence" /></div>
+        <p className="eyebrow">{session.agent_name.toUpperCase()}</p><h2>watching the room</h2>
+        <div className="presence-count"><span><b>{today.brief.encounter_count}</b> nearby</span><i /><span><b>{today.focus_items.length}</b> matter{today.focus_items.length === 1 ? "s" : ""}</span></div>
       </section>
-      <aside className="today-side">
-        {notifications.length > 0 && <section className="notification-center">
-          <div className="section-heading"><span>Agent 收件箱</span><b>{unreadCount}</b></div>
-          {notifications.slice(0, 3).map((item) => <article className={item.read_at ? "read" : ""} key={item.id}>
-            <i /><div><small>{item.kind.replaceAll("_", " ")}</small><h3>{item.title}</h3><p>{item.body}</p>
-              <footer>{item.action.href && <Link to={appPath(item.action.href)}>{item.action.label ?? "查看"} →</Link>}{!item.read_at && <button onClick={() => void markRead(item)}>标为已读</button>}</footer>
-            </div>
-          </article>)}
-        </section>}
-        {proactive.length > 0 && <section className="proactive-card"><p className="eyebrow">PROACTIVE AGENT · {proactive[0].kind.toUpperCase()}</p><h2>{proactive[0].title}</h2><p>{proactive[0].body}</p>{proactive[0].action.href && <Link to={appPath(proactive[0].action.href)}>{proactive[0].action.label ?? "查看"} →</Link>}</section>}
-        <section className="goal-card"><p className="eyebrow">设备连接</p><h2>{bleStatus}</h2><button className="button primary" onClick={() => void connectWearable()}>连接两台 KIN 设备 →</button><button className="button" disabled={!bleBridge.current} onClick={() => void bleBridge.current?.beginHandshake()}>两台按 1 后，开始握手 →</button><small>开始后：两台按 G0 确认，再同时握手。</small></section>
-        <section className="goal-card"><p className="eyebrow">当前网络目标</p><h2>{today.network_goal?.goal_text ?? "还没有设置 Network Goal"}</h2><button>调整目标 →</button></section>
-        <section className="brief-card"><div><b>{today.brief.encounter_count}</b><span>遇见的人</span></div><div><b>{today.brief.activity_count}</b><span>Agent 行动</span></div><div><b>{today.card_completion.percent}%</b><span>资料完整度</span></div></section>
-        <section className="encounter-list"><div className="section-heading"><span>RECENT KIN</span></div>{today.encounters.map((encounter) => { const person = today.agent_contexts[encounter.peer_agent_id]; return <div className="encounter" key={encounter.peer_agent_id}><div className="avatar">{person?.identity_assertion.display_name.slice(0, 1) ?? "K"}</div><span><b>{person?.identity_assertion.display_name ?? "Unknown Kin"}</b><small>{person?.card_summary.offering.slice(0, 2).join(" · ")}</small></span><time>{relativeTime(encounter.last_interaction_at)}</time></div>; })}</section>
-      </aside>
+      {primary && <section className="primary-moment"><div className="moment-kicker"><i />THIS MATTERS NOW</div><EventCard item={primary} context={primaryContext} /></section>}
+      <section className="life-stream"><header><div><p className="eyebrow">AGENT SUGGESTIONS</p><h2>Everything else can wait.</h2></div><span>{secondary.length} quiet signals</span></header><div className="life-stream-grid">{secondary.map((item) => <EventCard quiet key={item.attention_id} item={item} context={item.source_agent_id ? today.agent_contexts[item.source_agent_id] : undefined} />)}</div></section>
+      {proactive.some((item) => item.kind === "campfire") && <section className="campfire-tease"><img src={agentArtwork} alt="" /><div><p className="eyebrow">A TEAM JUST FORMED</p><h2>{proactive.find((item) => item.kind === "campfire")?.title}</h2><p>{proactive.find((item) => item.kind === "campfire")?.body}</p></div><Link to={appPath("/campfire")}>Review proposal →</Link></section>}
+      <section className="ambient-line">
+        <div className="network-whisper"><p className="eyebrow">YOUR AGENT IS WATCHING FOR</p><h3>{today.network_goal?.goal_text ?? "一个真正值得发生的连接"}</h3></div>
+        <div className="ambient-actions"><details className="device-whisper"><summary><i />{bleStatus}</summary><div><button onClick={() => void connectWearable()}>连接两台 KIN</button><button disabled={!bleBridge.current} onClick={() => void bleBridge.current?.beginHandshake()}>开始实体握手</button></div></details><Link to={appPath("/kin")}>{today.encounters.length} Kin remembered →</Link></div>
+      </section>
     </main>
   </AppShell>;
 }

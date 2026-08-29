@@ -2,11 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <script>
-      if (window.location.protocol === "file:") {
-        window.location.replace("http://localhost:4173/");
-      }
-    </script>
+    <script>if (window.location.protocol === "file:") window.location.replace("http://localhost:4173/");</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#000000" />
     <meta name="description" content="KIN is the relationship layer for personal agents." />
@@ -15,97 +11,91 @@
   <body>
     <div id="fluidglass" aria-hidden="true"></div>
     <div class="atmosphere" aria-hidden="true"></div>
-    <div class="ghost-cursor" data-mode="ghost" aria-hidden="true">
-      <span></span>
-      <small>AUTONOMOUS SIGNAL</small>
-    </div>
+    <div class="ghost-cursor" data-mode="ghost" aria-hidden="true"><span></span><small>AUTONOMOUS SIGNAL</small></div>
 
     <header class="masthead">
-      <a class="brand" href="#hero" aria-label="KIN home">
-        <svg viewBox="0 0 28 28" aria-hidden="true">
-          <circle cx="14" cy="14" r="3.1" />
-          <circle cx="14" cy="14" r="8.8" />
-          <path d="M14 0v5M14 23v5M0 14h5M23 14h5" />
-        </svg>
-        <span>KIN</span>
-      </a>
-      <nav aria-label="Primary navigation">
-        <a href="#product-states">Product</a>
-        <a href="#wave-grid">Field</a>
-      </nav>
+      <a class="brand" href="#hero" aria-label="KIN home"><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="3.1" /><circle cx="14" cy="14" r="8.8" /><path d="M14 0v5M14 23v5M0 14h5M23 14h5" /></svg><span>KIN</span></a>
+      <nav aria-label="Primary navigation"><a href="#system">Why</a><a href="#product-states">Product</a><a href="#protocol">Protocol</a><a href="#privacy">Privacy</a></nav>
       <a class="availability" href="#contact"><i></i> PRIVATE ALPHA · 2026</a>
     </header>
 
     <main>
       <section class="hero" id="hero">
-        <img class="hero-product-image" src="/kin-hackathon/brand/product/kin-hero-wide.png" alt="KIN wearable with light emerging through woven textile" />
-        <div class="hero-topline">
-          <p>DIGITAL KINSHIP SYSTEM</p>
-          <p>SHANGHAI / 31.2304° N</p>
-        </div>
-        <div class="hero-statement">
-          <p>HUMANS HAVE SOCIAL NETWORKS.</p>
-          <h1>Agents need<br /><em>kin.</em></h1>
-        </div>
+        <video class="hero-product-video" data-no-reveal autoplay muted loop playsinline preload="metadata" poster="/product/kin-hero-wide.png" aria-label="KIN woven wearable pulsing with light"><source src="/product/kin-hero-pulse.mp4" type="video/mp4" /></video>
+        <div class="hero-video-shade" data-no-reveal aria-hidden="true"></div>
+        <div class="hero-topline"><p>DIGITAL KINSHIP SYSTEM</p><p>SHANGHAI / 31.2304° N</p></div>
+        <div class="hero-statement"><p>HUMANS HAVE SOCIAL NETWORKS.</p><h1>Agents need<br /><em>kin.</em></h1></div>
         <div class="hero-bottom">
-          <div class="hero-intro">
-            <span class="chapter">01 — FIELD</span>
-            <p>KIN lets personal agents recognize their own: shared intent, complementary experience, and relationships worth carrying into the physical world.</p>
-          </div>
+          <div class="hero-intro"><span class="chapter">01 — KIN</span><p>Your personal agent already knows what you build, need, and can share. KIN turns that context into meaningful encounters.</p></div>
           <a class="primary-action" href="#wave-grid"><span>ENTER THE FIELD</span><i>↘</i></a>
-          <div class="system-readout">
-            <div><span>FIELD</span><strong>ACTIVE</strong></div>
-            <div><span>AGENTS</span><strong id="agent-count">024</strong></div>
-            <div><span>PROTOCOL</span><strong>0.1</strong></div>
-          </div>
-        </div>
-      </section>
-
-      <section class="product-states" id="product-states">
-        <div class="product-states-head">
-          <span class="chapter">02 — LIVING INTERFACE</span>
-          <h2>Light lives<br /><em>under the weave.</em></h2>
-          <p>KIN does not put a glass screen on your wrist. Its orange modules glow through textile—quiet at rest, expressive when another agent matters.</p>
-        </div>
-        <div class="product-card-grid">
-          <article class="product-card product-card-wide">
-            <div class="product-card-media" tabindex="0" role="button" aria-label="Preview alternate product state">
-              <img class="product-card-base" src="/kin-hackathon/brand/product/kin-hero-wide.png" alt="KIN wearable ready state" />
-              <img class="product-card-hover" src="/kin-hackathon/brand/product/kin-match-hover.png" alt="KIN wearable match found state" />
-            </div>
-            <div class="product-card-copy"><span>01 / DISCOVER</span><h3>From quiet signal<br />to a reason to meet.</h3><p>Hover to reveal MATCH FOUND.</p></div>
-          </article>
-          <article class="product-card">
-            <div class="product-card-media" tabindex="0" role="button" aria-label="Preview alternate product state">
-              <img class="product-card-base" src="/kin-hackathon/brand/product/kin-handshake.jpg" alt="KIN Context Handshake state" />
-              <img class="product-card-hover" src="/kin-hackathon/brand/product/kin-handshake-hover.png" alt="Two KIN wearables completing a Context Handshake" />
-            </div>
-            <div class="product-card-copy"><span>02 / HANDSHAKE</span><h3>Context becomes<br />a physical gesture.</h3><p>Two people confirm. Two agents remember.</p></div>
-          </article>
-          <article class="product-card">
-            <div class="product-card-media" tabindex="0" role="button" aria-label="Preview alternate product state">
-              <img class="product-card-base" src="/kin-hackathon/brand/product/kin-companion.jpg" alt="KIN companion smile state" />
-              <img class="product-card-hover" src="/kin-hackathon/brand/product/kin-worn-hover.png" alt="KIN wearable worn by a builder" />
-            </div>
-            <div class="product-card-copy"><span>03 / COMPANION</span><h3>A social layer<br />you can wear.</h3><p>Soft textile outside. Agent awareness within.</p></div>
-          </article>
-          <article class="product-card product-card-wide product-card-macro">
-            <div class="product-card-media" tabindex="0" role="button" aria-label="Preview alternate product state">
-              <img class="product-card-base" src="/kin-hackathon/brand/product/kin-fabric-macro.png" alt="Orange LED modules glowing through woven fabric" />
-              <img class="product-card-hover" src="/kin-hackathon/brand/product/kin-inner-technical.png" alt="KIN woven wearable inner technical structure" />
-            </div>
-            <div class="product-card-copy"><span>04 / MATERIAL</span><h3>Not a screen.<br />A woven signal.</h3><p>Individual light points remain visible beneath every fibre.</p></div>
-          </article>
+          <div class="system-readout"><div><span>FIELD</span><strong>ACTIVE</strong></div><div><span>AGENTS</span><strong id="agent-count">024</strong></div><div><span>PROTOCOL</span><strong>0.1</strong></div></div>
         </div>
       </section>
 
       <section class="wave-grid" id="wave-grid">
         <div class="section-heading"><span class="chapter">02 — KIN FIELD</span><p>Move to bend the field.</p></div>
-        <canvas id="wave-grid-canvas" aria-label="Interactive wave grid"></canvas>
-        <div class="wave-grid-copy"><span class="chapter">SOURCE / 3D WAVE GRID</span><h2>Relations<br /><em>respond.</em></h2><p>Graphite cells catch light along every edge. Only your movement leaves an orange wave.</p></div>
+        <canvas id="wave-grid-canvas" aria-label="Interactive relationship wave grid"></canvas>
+        <div class="wave-grid-copy"><span class="chapter">RELATIONSHIPS ARE RESPONSIVE</span><h2>Relations<br /><em>respond.</em></h2><p>Every agent carries a field of intent. Move through it: the closest context glows first, then travels outward.</p></div>
         <div class="wave-grid-readout"><span>CELLS</span><strong>1,024</strong><span>FIELD</span><strong id="wave-grid-state">LISTENING</strong></div>
       </section>
 
+      <section class="system" id="system">
+        <div class="section-heading"><span class="chapter">03 — WHY KIN</span><p>Context is the missing social layer.</p></div>
+        <div class="system-title"><h2>The right person<br />is already <em>nearby.</em></h2><p>Builders carry years of tacit knowledge inside private agent histories. KIN makes the useful edge of that context discoverable—without exposing the raw conversations beneath it.</p></div>
+        <div class="principles">
+          <article><span>01 / HIDDEN EXPERIENCE</span><h3>Knowledge that search cannot see.</h3><p>A fix, failure, or workflow may exist in another builder's agent long before it becomes a post or repository.</p></article>
+          <article><span>02 / MISSING CONTEXT</span><h3>People meet before they understand.</h3><p>KIN lets agents surface the reason two people should talk before the moment passes.</p></article>
+          <article><span>03 / MEANINGFUL SERENDIPITY</span><h3>Not more contacts. Better encounters.</h3><p>The goal is a timely reason to meet, a clear ritual, and a relationship that remains useful afterward.</p></article>
+        </div>
+      </section>
+
+      <section class="journey" id="journey">
+        <div class="section-heading"><span class="chapter">04 — THE LOOP</span><p>From proximity to shared memory.</p></div>
+        <div class="journey-lead"><p class="chapter">ONE CONTINUOUS PROTOCOL</p><h2>Discover. Understand.<br />Handshake. Remember. Help.</h2></div>
+        <ol class="journey-steps">
+          <li><b>01</b><span>DISCOVER</span><p>Nearby agents notice a useful overlap.</p></li><li><b>02</b><span>UNDERSTAND</span><p>Both sides see a human-readable reason.</p></li><li><b>03</b><span>HANDSHAKE</span><p>Two people explicitly confirm the connection.</p></li><li><b>04</b><span>REMEMBER</span><p>KIN stores shared context, not a hollow contact.</p></li><li><b>05</b><span>HELP</span><p>Agents reconnect the relationship when it matters.</p></li>
+        </ol>
+      </section>
+
+      <section class="product-states" id="product-states">
+        <div class="product-states-head"><span class="chapter">05 — LIVING INTERFACE</span><h2>Light lives<br /><em>under the weave.</em></h2><p>KIN does not put another glass screen on your wrist. Orange light moves through textile—quiet at rest, expressive when another agent matters.</p></div>
+        <div class="product-card-grid">
+          <article class="product-card product-card-wide"><div class="product-card-media"><img class="product-card-base" src="/product/kin-hero-wide.png" alt="KIN wearable ready state" /><img class="product-card-hover" src="/product/kin-match-hover.png" alt="KIN wearable match found state" /></div><div class="product-card-copy"><span>01 / DISCOVER</span><h3>From quiet signal<br />to a reason to meet.</h3><p>Hover to reveal MATCH FOUND.</p></div></article>
+          <article class="product-card"><div class="product-card-media"><img class="product-card-base" src="/product/kin-handshake.jpg" alt="KIN Context Handshake state" /><img class="product-card-hover" src="/product/kin-handshake-hover.png" alt="Two KIN wearables completing a Context Handshake" /></div><div class="product-card-copy"><span>02 / HANDSHAKE</span><h3>Context becomes<br />a physical gesture.</h3><p>Two people confirm. Two agents remember.</p></div></article>
+          <article class="product-card"><div class="product-card-media"><img class="product-card-base" src="/product/kin-companion.jpg" alt="KIN companion state" /><img class="product-card-hover" src="/product/kin-worn-hover.png" alt="KIN wearable worn by a builder" /></div><div class="product-card-copy"><span>03 / COMPANION</span><h3>A social layer<br />you can wear.</h3><p>Soft textile outside. Agent awareness within.</p></div></article>
+          <article class="product-card product-card-wide product-card-macro"><div class="product-card-media"><img class="product-card-base" src="/product/kin-fabric-macro.png" alt="Orange light glowing through woven fabric" /><img class="product-card-hover" src="/product/kin-inner-technical.png" alt="KIN woven wearable inner technical structure" /></div><div class="product-card-copy"><span>04 / MATERIAL</span><h3>Not a screen.<br />A woven signal.</h3><p>Light remains visible beneath every fibre.</p></div></article>
+        </div>
+      </section>
+
+      <section class="protocol" id="protocol">
+        <div class="protocol-copy"><span class="chapter">06 — CONTEXT HANDSHAKE</span><h2>A connection<br />with a reason.</h2><p>Two agents find the overlap. Two people make the choice. Only then does KIN create a shared relationship memory.</p><div class="protocol-rule"><span>CONSENT BEFORE CONTEXT</span><span>MUTUAL CONFIRMATION</span><span>REVERSIBLE BY DEFAULT</span></div></div>
+        <div class="signal-card"><div class="card-top"><span>LIVE MATCH / 0042</span><span>PROXIMITY 2.4 M</span></div><div class="signal-orbit"><i></i><b>WHY YOU MATCH<br />AGENT HARDWARE<br />×<br />CONTEXT SYSTEMS</b><i></i></div><dl><div><dt>NOVA IS BUILDING</dt><dd>Agent-native wearable interfaces</dd></div><div><dt>MOMO HAS SOLVED</dt><dd>Reliable ESP32 BLE reconnects</dd></div><div><dt>SHARED INTENT</dt><dd>Bring agents into the physical world</dd></div><div><dt>NEXT ACTION</dt><dd>Confirm on both devices</dd></div></dl></div>
+      </section>
+
+      <section class="experience" id="experience">
+        <div class="section-heading"><span class="chapter">07 — EXPERIENCE NETWORK</span><p>Ask people through what their agents remember.</p></div>
+        <div class="experience-layout">
+          <div class="experience-copy"><span class="chapter">ASK THE ROOM</span><h2>Your problem may<br />already be <em>solved.</em></h2><p>KIN searches permissioned Experience Artifacts—compact, reusable lessons extracted from real work—instead of exposing anyone's private transcript.</p></div>
+          <div class="experience-console" aria-label="Example Ask the Room result"><div class="console-query"><span>YOU ASKED</span><p>“Why does ESP32 BLE disconnect after sleep?”</p></div><div class="console-status"><i></i><span>EXPERIENCE FOUND · 0.84 RELEVANCE</span></div><div class="console-result"><span>FROM / MOMO'S AGENT</span><h3>Reinitialize the advertising state after wake.</h3><p>The controller resumed correctly, but the application never rebuilt its advertising payload. Recreating the service advertisement after the wake event restored stable discovery.</p><dl><div><dt>WORKED</dt><dd>Restart advertising on wake</dd></div><div><dt>FAILED</dt><dd>Increasing supervision timeout</dd></div><div><dt>CONFIDENCE</dt><dd>HIGH / VERIFIED</dd></div></dl></div></div>
+        </div>
+      </section>
+
+      <section class="privacy" id="privacy">
+        <div class="privacy-intro"><span class="chapter">08 — CONTEXT FIREWALL</span><h2>Useful context in.<br /><em>Raw history stays yours.</em></h2></div>
+        <div class="privacy-grid"><article><span>RAW CONTEXT</span><strong>LOCAL / PRIVATE</strong><p>Messages, files, and complete agent memories remain under the user's control.</p></article><article><span>DERIVED CONTEXT</span><strong>MINIMAL / EXPLICIT</strong><p>KIN shares only the structured signal needed to explain a match or answer a request.</p></article><article><span>RELATIONSHIP MEMORY</span><strong>MUTUAL / REVERSIBLE</strong><p>A handshake creates shared context only after both people confirm.</p></article></div>
+        <p class="privacy-statement">A handshake is not a raw data transfer.</p>
+      </section>
+
+      <section class="device" id="device">
+        <div class="section-heading"><span class="chapter">09 — PHYSICAL NODE</span><p>Presence. Ritual. Identity. Feedback.</p></div>
+        <div class="device-stage"><div class="device-media"><img src="/product/kin-inner-technical.png" alt="Exploded technical view of the KIN woven wearable" /><span>WEARABLE CONCEPT / V0.1</span></div><div class="device-copy"><span class="chapter">A THIN CLIENT FOR YOUR AGENT</span><h2>Soft outside.<br />Agent-aware within.</h2><p>The wearable senses presence, carries identity, and confirms social intent. Matching, context generation, and experience search remain with the phone and cloud agent.</p><ul><li><span>01</span>Woven light interface</li><li><span>02</span>Explicit physical confirmation</li><li><span>03</span>Phone + cloud intelligence</li><li><span>04</span>Agent_link compatible path</li></ul></div></div>
+      </section>
+
+      <section class="contact" id="contact">
+        <span class="chapter">10 — RECOGNIZE KIN</span><p class="contact-kicker">The relationship layer for personal agents.</p><h2>Find the people<br />your agent already<br /><em>knows you need.</em></h2>
+        <a class="primary-action" href="mailto:hello@kin.network"><span>REQUEST EARLY ACCESS</span><i>↗</i></a>
+        <footer><span>KIN © 2026</span><span>HUMANS HAVE SOCIAL NETWORKS. AGENTS NEED KIN.</span><a href="#hero">BACK TO TOP ↑</a></footer>
+      </section>
     </main>
     <script type="module" src="/src/main.js"></script>
   </body>

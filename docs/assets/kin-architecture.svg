@@ -1,45 +1,28 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" role="img" aria-labelledby="title desc">
-<title id="title">KIN Physical AI Architecture</title><desc id="desc">Two Cardputer-Adv devices sense a real-world encounter, use Agent_link over BLE through ROROLEE or relay, and reach KIN Agent services and TiDB before returning screen, sound and shared context outputs.</desc>
+<title id="title">KIN 系统架构与 TiDB 赛事合规</title><desc id="desc">从现实输入、ESP32 实体节点、Agent_link、KIN Agent 到 TiDB Cloud，再返回设备与网页结果。</desc>
 <defs>
-  <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#08111f"/><stop offset="1" stop-color="#101b32"/></linearGradient>
-  <linearGradient id="device" x1="0" x2="1"><stop stop-color="#18395a"/><stop offset="1" stop-color="#245375"/></linearGradient>
-  <linearGradient id="agent" x1="0" x2="1"><stop stop-color="#533280"/><stop offset="1" stop-color="#73419a"/></linearGradient>
-  <linearGradient id="db" x1="0" x2="1"><stop stop-color="#0b625f"/><stop offset="1" stop-color="#159477"/></linearGradient>
-  <filter id="shadow"><feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000" flood-opacity=".35"/></filter>
-  <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 Z" fill="#70e5d0"/></marker>
-  <style>
-    .h{font:700 36px Inter,Arial,sans-serif;fill:#f7fbff}.sub{font:400 17px Inter,Arial,sans-serif;fill:#b9c9df}.boxh{font:700 22px Inter,Arial,sans-serif;fill:#fff}.body{font:400 17px Inter,Arial,sans-serif;fill:#e2edf9}.tiny{font:600 14px Inter,Arial,sans-serif;fill:#9fb4cc}.arrow{stroke:#70e5d0;stroke-width:4;fill:none;marker-end:url(#arrow)}.dashed{stroke-dasharray:10 9}.team{stroke:#f7a35c;stroke-width:3}.official{stroke:#70e5d0;stroke-width:3}.config{stroke:#d49cff;stroke-width:3}
-  </style>
+ <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#07101e"/><stop offset="1" stop-color="#111d32"/></linearGradient>
+ <linearGradient id="tidb" x1="0" x2="1"><stop stop-color="#0c5d5d"/><stop offset="1" stop-color="#138a73"/></linearGradient>
+ <linearGradient id="kin" x1="0" x2="1"><stop stop-color="#583382"/><stop offset="1" stop-color="#74439a"/></linearGradient>
+ <filter id="shadow"><feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000" flood-opacity=".35"/></filter>
+ <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 Z" fill="#69e2cf"/></marker>
+ <style>.h{font:700 38px Arial,"PingFang SC",sans-serif;fill:#f8fbff}.sub{font:400 18px Arial,"PingFang SC",sans-serif;fill:#bdcce0}.bh{font:700 24px Arial,"PingFang SC",sans-serif;fill:#fff}.body{font:400 18px Arial,"PingFang SC",sans-serif;fill:#e7eff9}.small{font:600 15px Arial,"PingFang SC",sans-serif;fill:#b5c6da}.arrow{stroke:#69e2cf;stroke-width:4;fill:none;marker-end:url(#arrow)}.team{stroke:#f59a4a;stroke-width:3}.official{stroke:#69e2cf;stroke-width:3}.config{stroke:#d39bff;stroke-width:3}</style>
 </defs>
 <rect width="1600" height="1000" fill="url(#bg)"/>
-<text x="72" y="75" class="h">KIN · Physical AI Architecture</text>
-<text x="72" y="110" class="sub">Let your agent meet mine — real-world encounter → agent reasoning → shared context</text>
-<g transform="translate(110 145)"><rect width="1380" height="110" rx="20" fill="#16263d" stroke="#4c6686" stroke-width="2"/>
-<text x="30" y="36" class="boxh">REAL-WORLD INPUT</text><text x="30" y="70" class="body">Nearby Builder presence · G0 / TCA8418 keyboard confirmation · BMI270 shake gesture · optional voice Need</text>
-<circle cx="1300" cy="55" r="20" fill="#f7a35c"/><text x="1335" y="61" class="tiny">human action</text></g>
-<path d="M800 255 V295" class="arrow"/>
-<g transform="translate(110 300)"><rect width="1380" height="200" rx="20" fill="url(#device)" class="team" filter="url(#shadow)"/>
-<text x="30" y="38" class="boxh">TEAM-BUILT DEVICE LAYER · 2 × M5Stack Cardputer-Adv</text>
-<text x="30" y="77" class="body">ESP32-S3 Thin Client · ST7789V2 240×135 screen · BMI270 IMU · TCA8418 56-key keyboard</text>
-<text x="30" y="108" class="body">ES8311 codec + microphone + speaker · battery · stable NODE identity</text>
-<rect x="30" y="133" width="220" height="42" rx="10" fill="#10243b" class="team"/><text x="50" y="160" class="body">Cardputer Board Adapter</text>
-<rect x="270" y="133" width="170" height="42" rx="10" fill="#10243b" class="official"/><text x="296" y="160" class="body">Agent_link SDK</text>
-<text x="1120" y="160" class="tiny">sense · identify · ritual · feedback</text></g>
-<path d="M800 500 V540" class="arrow"/>
-<g transform="translate(110 545)"><rect width="1380" height="115" rx="20" fill="#18233b" class="official"/>
-<text x="30" y="38" class="boxh">OFFICIAL CONNECTIVITY PATH</text><text x="30" y="74" class="body">Agent_link BLE → ROROLEE / Deotaland path → Cloud Agent Gateway</text><text x="890" y="74" class="tiny">team relay available for local demo + diagnostics</text></g>
-<path d="M800 660 V700" class="arrow"/>
-<g transform="translate(110 705)"><rect width="850" height="205" rx="20" fill="url(#agent)" class="team" filter="url(#shadow)"/>
-<text x="30" y="38" class="boxh">TEAM-BUILT KIN AGENT / CUSTOM SERVICES</text>
-<text x="30" y="76" class="body">Profile &amp; Context Compiler · Presence / Radar · Match Engine</text>
-<text x="30" y="108" class="body">Handshake Service · Relationship Memory · Need / Experience Search</text>
-<text x="30" y="140" class="body">Prompt / Policy: explain the match, require bilateral consent, protect raw context</text>
-<text x="30" y="178" class="tiny">Tools: Match · Handshake · Experience · Device Output · SSE events</text></g>
-<g transform="translate(1010 705)"><rect width="480" height="205" rx="20" fill="url(#db)" class="team" filter="url(#shadow)"/>
-<text x="30" y="38" class="boxh">TiDB CLOUD · TEAM DATA LAYER</text>
-<text x="30" y="76" class="body">SQL: profiles · matches · handshakes</text><text x="30" y="108" class="body">relationships · needs · artifacts</text><text x="30" y="140" class="body">Vector Search: VECTOR(64) indexes</text><text x="30" y="178" class="tiny">one source of relationship state + semantic recall</text></g>
-<path d="M960 805 H1010" class="arrow"/>
-<path d="M535 910 V950 H1160 V910" class="arrow dashed"/>
-<g transform="translate(110 930)"><rect width="1380" height="42" rx="12" fill="#15253b"/><text x="25" y="28" class="body">ACTUAL OUTPUT → screen: MATCH FOUND / KIN CONNECTED · speaker: tone · Web/PWA: WHY YOU MATCH / Shared Context / EXPERIENCE FOUND</text></g>
-<g transform="translate(1120 126)"><rect width="370" height="30" rx="8" fill="#122238"/><circle cx="18" cy="15" r="6" fill="#70e5d0"/><text x="32" y="20" class="tiny">Organizer-provided</text><circle cx="145" cy="15" r="6" fill="#d49cff"/><text x="159" y="20" class="tiny">Team-configured</text><circle cx="275" cy="15" r="6" fill="#f7a35c"/><text x="289" y="20" class="tiny">Team-built</text></g>
+<text x="70" y="66" class="h">KIN 系统架构与赛事合规</text><text x="70" y="100" class="sub">现实相遇 → Agent 理解 → TiDB 关系记忆与经验检索 → 可观察输出</text>
+<g transform="translate(70 128)" filter="url(#shadow)"><rect width="1460" height="150" rx="22" fill="url(#tidb)" stroke="#69e2cf" stroke-width="4"/>
+<text x="32" y="43" class="bh">TiDB 赛事合规核心</text><text x="32" y="82" class="body">真实主数据：用户画像 · 匹配 · 双向握手 · 关系记忆 · 需求 · 经验 · 通知</text><text x="32" y="116" class="body">真实智能检索：TiDB VECTOR(64) × 3 + 向量索引 × 3；Need → Experience 与 Profile 匹配已在云端闭环验证</text>
+<rect x="1120" y="35" width="300" height="78" rx="15" fill="#073e3f"/><text x="1150" y="66" class="small">不是展示性依赖</text><text x="1150" y="94" class="body">数据与检索都真实运行</text></g>
+<g transform="translate(70 320)"><rect width="310" height="205" rx="20" fill="#172942" stroke="#536f91" stroke-width="2"/><text x="25" y="42" class="bh">① 现实输入</text><text x="25" y="82" class="body">附近的人</text><text x="25" y="116" class="body">双方明确确认</text><text x="25" y="150" class="body">动作 / 语音信号</text><text x="25" y="184" class="small">用户主动触发</text></g>
+<path d="M380 422 H420" class="arrow"/>
+<g transform="translate(425 320)"><rect width="310" height="205" rx="20" fill="#204d6d" class="team"/><text x="25" y="42" class="bh">② ESP32 实体节点</text><text x="25" y="82" class="body">感知 · 身份 · 同意</text><text x="25" y="116" class="body">屏幕与声音反馈</text><text x="25" y="150" class="body">ESP-IDF 5.5.4</text><text x="25" y="184" class="small">当前载体可替换</text></g>
+<path d="M735 422 H775" class="arrow"/>
+<g transform="translate(780 320)"><rect width="310" height="205" rx="20" fill="#17243d" class="official"/><text x="25" y="42" class="bh">③ 主办方通信路径</text><text x="25" y="82" class="body">Agent_link 协议</text><text x="25" y="116" class="body">BLE 事件与设备能力</text><text x="25" y="150" class="body">ROROLEE / 网关路径</text><text x="25" y="184" class="small">本地桥接用于联调与演示</text></g>
+<path d="M1090 422 H1130" class="arrow"/>
+<g transform="translate(1135 320)"><rect width="395" height="205" rx="20" fill="url(#kin)" class="team"/><text x="25" y="42" class="bh">④ KIN Agent</text><text x="25" y="82" class="body">生成“为什么匹配”</text><text x="25" y="116" class="body">校验双方同意与幂等</text><text x="25" y="150" class="body">编译画像 · 检索经验</text><text x="25" y="184" class="small">隐私策略：原始对话留在本地</text></g>
+<path d="M1330 525 V575 H800 V612" class="arrow"/>
+<g transform="translate(250 620)" filter="url(#shadow)"><rect width="1100" height="178" rx="22" fill="url(#tidb)" class="team"/><text x="32" y="44" class="bh">⑤ TiDB Cloud：统一保存关系状态与语义向量</text><text x="32" y="86" class="body">事务数据：Profile · Match · Handshake · Relationship · Need · Experience</text><text x="32" y="122" class="body">向量检索：人物匹配、Need → Experience、可解释结果召回</text><text x="32" y="154" class="small">已验证：17 张表 · 3 个向量字段 · 3 个向量索引 · 真实 API 回归 PASS</text></g>
+<path d="M800 798 V842" class="arrow"/>
+<g transform="translate(70 850)"><rect width="1460" height="88" rx="18" fill="#162941" stroke="#536f91" stroke-width="2"/><text x="28" y="36" class="bh">⑥ 用户可见结果</text><text x="28" y="68" class="body">实体节点：匹配成功 / 已连接 / 提示音　　网页：匹配理由 / Shared Context / Experience Found / 后续协作</text></g>
+<g transform="translate(1030 80)"><circle cx="15" cy="15" r="7" fill="#69e2cf"/><text x="30" y="21" class="small">主办方提供</text><circle cx="150" cy="15" r="7" fill="#d39bff"/><text x="165" y="21" class="small">团队配置</text><circle cx="275" cy="15" r="7" fill="#f59a4a"/><text x="290" y="21" class="small">团队开发</text></g>
 </svg>

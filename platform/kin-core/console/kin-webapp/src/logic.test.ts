@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { demoToday } from "./fixtures";
-import { attentionCount, campfireReady, categoryLabel, confidenceLabel, confirmCampfireMember, confirmedCampfireCount, experienceArtifactPayload, experiencePercent, intersectTags, matchPercent, observationCopy, openFollowUpCount, pendingCandidateCount, profileCompletion, rankMatches, relationshipPeerName, relativeTime, sortExperienceMatches, sortRelationships, splitProfileList, strongestReason } from "./logic";
+import { attentionCount, campfireReady, categoryLabel, composerIntentLabel, confidenceLabel, confirmCampfireMember, confirmedCampfireCount, experienceArtifactPayload, experiencePercent, inferComposerIntent, intersectTags, matchPercent, observationCopy, openFollowUpCount, pendingCandidateCount, profileCompletion, rankMatches, relationshipPeerName, relativeTime, sortExperienceMatches, sortRelationships, splitProfileList, strongestReason } from "./logic";
 import { demoRadar } from "./fixtures";
 import { demoExperienceMatches } from "./fixtures";
 import { demoCampfires, demoProfileStudio, demoRelationships, demoSession } from "./fixtures";
@@ -13,6 +13,12 @@ describe("KIN Today presentation", () => {
 });
 
 describe("Ask the Room presentation", () => {
+  it("lets the Agent route natural language instead of exposing the Signal schema", () => {
+    expect(inferComposerIntent("我终于搞定 ESP32 BLE 断连了")).toBe("SOLVED");
+    expect(inferComposerIntent("我正在做一个 Agent wearable")).toBe("BUILDING");
+    expect(inferComposerIntent("有没有人解决过 BLE 断连？")).toBe("NEED");
+    expect(composerIntentLabel("NEED")).toContain("Agent 网络");
+  });
   it("bounds experience score for the result badge", () => expect(experiencePercent(1.2)).toBe(100));
   it("sorts experience matches without mutating the response", () => {
     const reversed = [...demoExperienceMatches].reverse();

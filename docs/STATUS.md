@@ -1,3 +1,25 @@
+## 2026-08-29 GitHub 交付同步与 TiDB 合规前置
+
+- README 首屏新增 TiDB 赛事合规说明，明确 TiDB Cloud 承担真实主数据、关系状态和 Vector Search，而非展示性依赖。
+- 一页架构图改为中文主叙事，将 TiDB 合规核心前置，并把硬件抽象为可替换的 ESP32 实体节点；当前开发板只保留在实现说明中。
+- `docs/CURRENT.md` 已同步今晚完成的 Pixel 双节点握手冻结、四入口用户端、官网叙事、Profile Intelligence 与真实 TiDB 闭环。
+- 交付口径统一为：主办方 Agent_link 协议 + TiDB 核心数据/向量能力 + 团队 KIN Agent 与实体节点适配。
+
+## 2026-08-29 KIN 官网完整品牌叙事 V1
+
+- Hero 已接入用户提供的 10 秒 KIN 可穿戴设备脉冲视频，自动、静音、循环播放，并在离开首屏后暂停以降低资源占用。
+- 官网扩展为 10 屏完整叙事：Hero、互动 Field、Why KIN、五步闭环、产品状态、Context Handshake、Experience Network、Context Firewall、Physical Node 与联系 CTA。
+- 保留第二屏鼠标跟随方块波场，并让状态读数在交互时从 `LISTENING` 切换为 `RESPONDING`；修复 Three.js 销毁时空 controls 引发的重载异常。
+- 验证：Vitest `4 passed`；Vite `106 modules transformed`；桌面端 10 个分区、9 张图片全部加载；移动端 `scrollWidth === clientWidth === 375`，Hero 视频 `readyState=4`，控制台 `logs=[]`。
+
+## 2026-08-29 KIN 用户端极简专业化 V1.1
+
+- 一级导航保持 `Today / Ask / Kin / Me`，产品入口围绕当下事件、自然语言求助、关系记忆和 Builder Identity；Radar 下沉为 Kin 的 Nearby 二级页。
+- Today 次级事件从 3 个收敛到 2 个，移除 Quiet Inbox 卡片，并将 Network Goal、Device 与 Kin Memory 合并成安静状态线。
+- 导航和关系、扫描、Handshake 等状态不再使用 Unicode / emoji 式符号，统一改为 CSS 线性几何图形；同时降低橙色填充、圆角、阴影与卡片密度。
+- 使用内置 ImageGen 生成 KIN Agent woven-organism 主视觉，集成 Today、Ask、Me 与 Campfire；项目资产为 `platform/kin-core/console/kin-webapp/public/art/nova-organism-v1.jpg`。
+- 验证：Vitest `22 passed`；Vite `50 modules transformed`；桌面 Today / Ask / Kin / Me / Handshake 视觉通过；移动端 `scrollWidth === clientWidth === 375`，控制台 `errors=[]`。
+
 ## 2026-08-29 Pixel × 双 Cardputer Phone Handshake Freeze V1
 
 - 实板验收通过：Pixel Android Chrome 连入两台 Cardputer-Adv；双方进入 KIN LINK、G0 确认、共同握手后显示 `KIN CONNECTED / CONTEXT SAVED`。
@@ -1122,18 +1144,4 @@ What is verified:
 - 本地 HTTP 访问返回 200；16:9 浏览器逐页检查无越界文本，4 张图片全部加载，console error/warning 为 0。
 - 提词快捷键与 `?presenter=1` 演讲者视图实测可用；独立副本回滚后恢复为单页原始讲稿包装，主 `MODIFIED_FILE.html` 保持交互路演版本。
 - 交付、diff、验证与回滚材料：`outputs/kin-investor-pitch-html-v0.1/`。
-## 2026-08-29 KIN user web event-driven IA refactor
-
-- 用户端一级导航收敛为 `Today / Ask / Kin / Me`；Radar 下沉为 `Kin → Nearby`，Campfire 由 Today 事件触发，`/signals` 保留兼容路由但不再暴露 Signal schema。
-- Today 改为单一主事件 + 安静建议流，用 Agent 生命状态、时间和 Why Now 取代 Dashboard 卡片堆叠。
-- Ask 改为全局自然语言 Composer：Agent 自动路由 `NEED / BUILDING / SOLVED / DISCOVERED / AVAILABLE`，需求结果先返回 Agent 总结，再展开 Experience Artifact。
-- Context Handshake 新增全屏 `HANDSHAKE → CONNECTED → Shared Context` 转场；Kin 首页改为“为什么现在值得重新联系”的关系列表。
-- Me 第一屏改为 Builder Identity + Current Obsession + Offering/Seeking + AI Life，Context Studio 下沉为二级管理页。
-- 验证：Vitest `22 passed`；Vite `50 modules transformed`；桌面端 Today/Ask/Kin/Me 视觉验收通过；390 px 移动端四入口、无水平溢出；Agent 自动分类与 Handshake 全屏转场交互验收通过。
-## 2026-08-29 KIN user web minimal editorial pass
-
-- 用户端再次减量：Today 次级事件从 3 个收敛到 2 个，移除重复 Quiet Inbox，Network Goal、Device 和 Kin Memory 合并为一条安静状态线。
-- 去掉一级导航的 Unicode / emoji 式符号，改为纯 CSS 线性图形；降低橙色填充、圆角、阴影和卡片数量。
-- 使用内置 ImageGen 生成 KIN Agent 的 woven-organism 主视觉，导出为 768px / 135KB JPEG，集成 Today、Ask、Me 与 Campfire；项目资产路径 `platform/kin-core/console/kin-webapp/public/art/nova-organism-v1.jpg`。
-- 视觉验收：桌面端 Today / Ask 通过；Me / Campfire 生成视觉加载通过；390px 移动端主事件宽度 `339px`，`scrollWidth === clientWidth === 375`，控制台 `errors=[]`。
-- 验证：Vitest `22 passed`；Vite `50 modules transformed`。
+- 连接修复：新增 `START_PRESENTATION.command`，由独立 Terminal 前台持有本地服务并自动打开首屏；跨命令复检仍为 HTTP 200，避免临时任务结束后端口消失。

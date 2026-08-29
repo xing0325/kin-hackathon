@@ -99,7 +99,8 @@ export default class Orchestrator {
             }
         });
 
-        this.camera.controls.dispose();
+        this.stage?.mouseTrail?.dispose?.();
+        this.camera.controls?.dispose?.();
         this.renderer.instance.dispose();
 
         if (this.debug.active) this.debug.ui.destroy();

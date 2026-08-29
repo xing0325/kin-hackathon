@@ -323,6 +323,7 @@ export const demoSignals: SignalItem[] = [
 ];
 
 export const demoProactive: ProactiveItem[] = [
+  { id: "pro_campfire_room", owner_id: demoSession.agent_id, kind: "campfire", title: "You + Momo + Kai", body: "Hardware, Agent UX 和 Experience Retrieval 刚好能组成一个完整的 KIN Room Demo。", action: { label: "Review proposal", href: "/campfire" }, source_id: "camp_hackathon_01", status: "open", created_at: new Date(now - 40_000).toISOString() },
   { id: "pro_signal_kai", owner_id: demoSession.agent_id, kind: "signal_match", title: "Kai 发布了 NEED", body: "需要一个做过 ESP32 BLE 稳定性的人 · 你的 Agent 判断你可能帮得上。", action: { label: "查看 Signal", href: "/signals" }, source_id: "sig_need_ble", status: "open", created_at: new Date(now - 80_000).toISOString() },
   { id: "pro_follow_momo", owner_id: demoSession.agent_id, kind: "follow_up", title: "一段关系值得继续", body: "把 BLE relay 仓库和当前验证状态发给 Momo。", action: { label: "打开 Shared Context", href: "/kin/rel_momo_01" }, source_id: "rel_momo_01", status: "open", created_at: new Date(now - 1_800_000).toISOString() },
 ];

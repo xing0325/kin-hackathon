@@ -27,6 +27,14 @@ document.querySelectorAll("section > *").forEach((element) => {
   revealObserver.observe(element);
 });
 
+// Keep image swapping scoped to the visible media rectangle, not card copy.
+document.querySelectorAll(".product-card-media").forEach((media) => {
+  media.addEventListener("pointerenter", () => media.classList.add("is-hovered"));
+  media.addEventListener("pointerleave", () => media.classList.remove("is-hovered"));
+  media.addEventListener("focusin", () => media.classList.add("is-hovered"));
+  media.addEventListener("focusout", () => media.classList.remove("is-hovered"));
+});
+
 window.addEventListener("beforeunload", () => field.destroy());
 
 const waveGrid = new OriginalWaveGrid(document.querySelector("#wave-grid-canvas"));

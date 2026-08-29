@@ -1,3 +1,9 @@
+## 2026-08-29 Hover runtime-state fix
+
+- Added explicit pointerenter/pointerleave state handling on each image rectangle to avoid stale hover behavior after load.
+- Copy/background remains outside the trigger; keyboard focus follows the same state path.
+- Verification: frontend tests `4 passed`; Vite build `107 modules transformed`.
+
 ## 2026-08-29 Generated KIN artwork integration
 
 - Added a wide negative-space Hero product image and integrated generated woven-light macro and inner technical renders into the product gallery.

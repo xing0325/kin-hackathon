@@ -374,8 +374,8 @@ section { position: relative; min-height: 100svh; }
 .product-card-copy span { font: 500 8px "DM Mono", monospace; letter-spacing: .16em; color: #f77e2d; }
 .product-card-copy h3 { margin-top: 12px; font-size: clamp(28px, 3vw, 48px); line-height: .96; letter-spacing: -.045em; font-weight: 380; }
 .product-card-copy p { margin-top: 14px; font: 400 10px "DM Mono", monospace; color: rgba(255,255,255,.62); }
-.product-card:is(:hover, :focus-within) .product-card-base { opacity: 0; transform: scale(1.055); }
-.product-card:is(:hover, :focus-within) .product-card-hover { opacity: 1; transform: scale(1); }
+.product-card-media:is(:hover, :focus-within) .product-card-base { opacity: 0; transform: scale(1.055); }
+.product-card-media:is(:hover, :focus-within) .product-card-hover { opacity: 1; transform: scale(1); }
 .product-card-macro .product-card-base { object-position: 50% 52%; }
 @media (hover: none) {
   .product-card-hover { animation: product-state-cycle 7s ease-in-out infinite alternate; }

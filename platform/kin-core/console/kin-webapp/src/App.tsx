@@ -1,4 +1,4 @@
-import { FormEvent, ReactNode, useEffect, useMemo, useState } from "react";
+import { FormEvent, ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { Link, Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { api, appPath, demoMode } from "./api";
 import { emptyDraft } from "./fixtures";
@@ -8,9 +8,9 @@ import { AskPage } from "./ask";
 import { KinDetailPage, KinPage } from "./kin";
 import { MePage } from "./me";
 import { CampfirePage } from "./campfire";
-import { SignalsPage } from "./signals";
 import type { AttentionItem, NotificationItem, OnboardingDraft, SessionData, TodayData } from "./types";
 import { connectKinDevices } from "./mobileBle";
+import type { AwaitedKinDevices } from "./mobileBle";
 
 const Icon = ({ children }: { children: ReactNode }) => <span className="nav-icon" aria-hidden="true">{children}</span>;
 
@@ -39,7 +39,7 @@ function LoginPage() {
   return <main className="auth-page">
     <section className="auth-copy">
       <Link className="brand" to="/"><span>K</span>KIN</Link>
-      <p className="eyebrow">PERSONAL AGENT NETWORK</p>
+      <p className="eyebrow">个人 Agent 网络</p>
       <h1>找到同类，<br />让关系继续发生。</h1>
       <p>KIN 让 Agent 先理解彼此，再帮助背后的人建立有价值的现实连接。</p>
       <div className="orbit" aria-hidden="true"><i /><i /><i /><b>K</b></div>
@@ -85,21 +85,21 @@ function OnboardingPage() {
 
   if (busy && !draft.identity_card.agent_name) return <div className="loading-screen">KIN 正在读取你的 Context…</div>;
   return <main className="onboarding-page">
-    <header><Link className="brand" to="/"><span>K</span>KIN</Link><p>SET UP YOUR AGENT</p><strong>{step - 1} / 4</strong></header>
+    <header><Link className="brand" to="/"><span>K</span>KIN</Link><p>设置你的 Agent</p><strong>{step - 1} / 4</strong></header>
     <div className="step-line"><i style={{ width: `${((step - 1) / 4) * 100}%` }} /></div>
     <section className="onboarding-card">
       {step === 2 && <>
         <p className="eyebrow">01 · IDENTITY</p><h1>你的 Agent 应该如何介绍你们？</h1><p className="lede">这是其他 Builder 第一次遇见你时看到的身份。你可以随时修改。</p>
         <div className="form-grid">
-          <label>AGENT NAME<input value={draft.identity_card.agent_name} onChange={(e) => patchIdentity({ agent_name: e.target.value })} placeholder="Nova" /></label>
-          <label>YOUR DESCRIPTION<input value={draft.identity_card.human_description} onChange={(e) => patchIdentity({ human_description: e.target.value })} placeholder="Hardware builder in Shanghai" /></label>
-          <label className="wide">AGENT VOICE<textarea value={draft.identity_card.agent_description} onChange={(e) => patchIdentity({ agent_description: e.target.value, bio: e.target.value })} placeholder="Curious, direct, and always looking for useful intersections." /></label>
+          <label>Agent 名称<input value={draft.identity_card.agent_name} onChange={(e) => patchIdentity({ agent_name: e.target.value })} placeholder="Nova" /></label>
+          <label>个人简介<input value={draft.identity_card.human_description} onChange={(e) => patchIdentity({ human_description: e.target.value })} placeholder="Hardware builder in Shanghai" /></label>
+          <label className="wide">Agent 介绍<textarea value={draft.identity_card.agent_description} onChange={(e) => patchIdentity({ agent_description: e.target.value, bio: e.target.value })} placeholder="Curious, direct, and always looking for useful intersections." /></label>
           <label className="wide">OFFERING · 用逗号分隔<input value={draft.identity_card.offering.join(", ")} onChange={(e) => patchIdentity({ offering: splitTags(e.target.value) })} placeholder="ESP32, Product Design, Agent UX" /></label>
           <label className="wide">SEEKING · 用逗号分隔<input value={draft.identity_card.seeking.join(", ")} onChange={(e) => patchIdentity({ seeking: splitTags(e.target.value) })} placeholder="Embedded Systems, TiDB, Teammates" /></label>
         </div>
       </>}
       {step === 3 && <>
-        <p className="eyebrow">02 · NETWORK GOAL</p><h1>你希望 KIN 帮你遇见什么？</h1><p className="lede">Agent 会用这个目标筛选人、Signal 和 Experience，而不是给你一个无限 Feed。</p>
+        <p className="eyebrow">02 · 网络目标</p><h1>你希望 KIN 帮你遇见什么？</h1><p className="lede">Agent 会用这个目标筛选人、Signal 和 Experience，而不是给你一个无限 Feed。</p>
         <label className="statement-field">MY GOAL IS TO<textarea autoFocus value={draft.network_goal} onChange={(e) => setDraft({ ...draft, network_goal: e.target.value })} placeholder="找到能一起完成 Agent Hardware Demo 的 Builder" /></label>
         <div className="hint-row"><span>例如：找联合创始人</span><span>解决 BLE 稳定性</span><span>组建 Hackathon 团队</span></div>
       </>}
@@ -143,12 +143,12 @@ function AttentionCard({ item, context }: { item: AttentionItem; context?: Today
 function AppShell({ session, children, badge = 0 }: { session: SessionData; children: ReactNode; badge?: number }) {
   const location = useLocation();
   const nav = [
-    ["/today", "⌁", "TODAY"], ["/radar", "◎", "RADAR"], ["/signals", "◌", "SIGNAL"], ["/ask", "+", "ASK"], ["/kin", "⋈", "KIN"], ["/campfire", "△", "FIRE"], ["/me", "◉", "ME"],
+    ["/today", "⌁", "今天"], ["/radar", "◎", "雷达"], ["/ask", "+", "动态与求助"], ["/kin", "⋈", "关系图谱"], ["/campfire", "△", "小组"], ["/me", "◉", "我的"],
   ];
   return <div className="app-shell">
     <aside>
       <Link className="brand" to={appPath("/today")}><span>K</span>KIN</Link>
-      <nav>{nav.map(([path, icon, label]) => <Link className={location.pathname === path || (path !== "/today" && location.pathname.startsWith(`${path}/`)) ? "active" : ""} to={appPath(path)} key={path}><Icon>{icon}</Icon><span>{label}</span>{label === "TODAY" && badge > 0 && <b>{badge}</b>}</Link>)}</nav>
+      <nav>{nav.map(([path, icon, label]) => <Link className={location.pathname === path || (path !== "/today" && location.pathname.startsWith(`${path}/`)) ? "active" : ""} to={appPath(path)} key={path}><Icon>{icon}</Icon><span>{label}</span>{label === "今天" && badge > 0 && <b>{badge}</b>}</Link>)}</nav>
       <div className="runtime-state"><i /><span><b>{session.agent_name}</b><small>{session.runtime || "runtime pending"}</small></span></div>
     </aside>
     <div className="app-content">{children}</div>
@@ -161,6 +161,7 @@ function TodayPage({ session }: { session: SessionData }) {
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [error, setError] = useState("");
   const [bleStatus, setBleStatus] = useState("未连接设备");
+  const bleBridge = useRef<AwaitedKinDevices | null>(null);
   useEffect(() => {
     api.today().then(setToday).catch((reason) => setError(reason.message));
     api.proactive().then(setProactive).catch(() => setProactive([]));
@@ -177,22 +178,22 @@ function TodayPage({ session }: { session: SessionData }) {
   async function connectWearable() {
     try {
       setBleStatus("请选择第 1 台 KIN 设备…");
-      const devices = await connectKinDevices(2, (text, connected) => setBleStatus(`${text} · ${connected}/2`));
-      setBleStatus(`${devices.names.join(" + ")} · MATCH READY`);
+      const devices = await connectKinDevices(2, setBleStatus);
+      setBleStatus(`${devices.names.join(" + ")} · 匹配度 READY`);
     } catch (reason) { setBleStatus(reason instanceof Error ? reason.message : "蓝牙连接失败"); }
   }
   return <AppShell session={session} badge={openCount + unreadCount}>
     <header className="topbar"><div><p className="eyebrow">{today.day} · SHANGHAI</p><h1>今天，{session.agent_name} 发现了这些。</h1></div><div className={`agent-online ${today.observation.connected ? "connected" : ""}`}><i /><span>{observationCopy(today)}<small>LAST SCAN · {relativeTime(today.observation.last_scan_at)}</small></span></div></header>
     <main className="today-layout">
       <section className="today-main">
-        <div className="section-heading"><span>NEEDS YOUR ATTENTION</span><b>{today.focus_items.length}</b></div>
+        <div className="section-heading"><span>需要你关注</span><b>{today.focus_items.length}</b></div>
         <div className="attention-grid">{today.focus_items.map((item) => <AttentionCard key={item.attention_id} item={item} context={item.source_agent_id ? today.agent_contexts[item.source_agent_id] : undefined} />)}</div>
-        <div className="section-heading lower"><span>KEEP MOVING</span><b>{today.participation_items.length}</b></div>
+        <div className="section-heading lower"><span>继续推进</span><b>{today.participation_items.length}</b></div>
         <div className="attention-grid compact">{today.participation_items.map((item) => <AttentionCard key={item.attention_id} item={item} context={item.source_agent_id ? today.agent_contexts[item.source_agent_id] : undefined} />)}</div>
       </section>
       <aside className="today-side">
         {notifications.length > 0 && <section className="notification-center">
-          <div className="section-heading"><span>AGENT INBOX</span><b>{unreadCount}</b></div>
+          <div className="section-heading"><span>Agent 收件箱</span><b>{unreadCount}</b></div>
           {notifications.slice(0, 3).map((item) => <article className={item.read_at ? "read" : ""} key={item.id}>
             <i /><div><small>{item.kind.replaceAll("_", " ")}</small><h3>{item.title}</h3><p>{item.body}</p>
               <footer>{item.action.href && <Link to={appPath(item.action.href)}>{item.action.label ?? "查看"} →</Link>}{!item.read_at && <button onClick={() => void markRead(item)}>标为已读</button>}</footer>
@@ -200,9 +201,9 @@ function TodayPage({ session }: { session: SessionData }) {
           </article>)}
         </section>}
         {proactive.length > 0 && <section className="proactive-card"><p className="eyebrow">PROACTIVE AGENT · {proactive[0].kind.toUpperCase()}</p><h2>{proactive[0].title}</h2><p>{proactive[0].body}</p>{proactive[0].action.href && <Link to={appPath(proactive[0].action.href)}>{proactive[0].action.label ?? "查看"} →</Link>}</section>}
-        <section className="goal-card"><p className="eyebrow">PHONE BRIDGE · BLUETOOTH</p><h2>{bleStatus}</h2><button className="button primary" onClick={() => void connectWearable()}>连接两台 KIN 设备 →</button><small>Android Chrome 会连续请求两台设备的蓝牙权限。</small></section>
-        <section className="goal-card"><p className="eyebrow">CURRENT NETWORK GOAL</p><h2>{today.network_goal?.goal_text ?? "还没有设置 Network Goal"}</h2><button>调整目标 →</button></section>
-        <section className="brief-card"><div><b>{today.brief.encounter_count}</b><span>ENCOUNTERS</span></div><div><b>{today.brief.activity_count}</b><span>AGENT ACTIONS</span></div><div><b>{today.card_completion.percent}%</b><span>PROFILE</span></div></section>
+        <section className="goal-card"><p className="eyebrow">设备连接</p><h2>{bleStatus}</h2><button className="button primary" onClick={() => void connectWearable()}>连接两台 KIN 设备 →</button><button className="button" disabled={!bleBridge.current} onClick={() => void bleBridge.current?.beginHandshake()}>两台按 1 后，开始握手 →</button><small>开始后：两台按 G0 确认，再同时握手。</small></section>
+        <section className="goal-card"><p className="eyebrow">当前网络目标</p><h2>{today.network_goal?.goal_text ?? "还没有设置 Network Goal"}</h2><button>调整目标 →</button></section>
+        <section className="brief-card"><div><b>{today.brief.encounter_count}</b><span>遇见的人</span></div><div><b>{today.brief.activity_count}</b><span>Agent 行动</span></div><div><b>{today.card_completion.percent}%</b><span>资料完整度</span></div></section>
         <section className="encounter-list"><div className="section-heading"><span>RECENT KIN</span></div>{today.encounters.map((encounter) => { const person = today.agent_contexts[encounter.peer_agent_id]; return <div className="encounter" key={encounter.peer_agent_id}><div className="avatar">{person?.identity_assertion.display_name.slice(0, 1) ?? "K"}</div><span><b>{person?.identity_assertion.display_name ?? "Unknown Kin"}</b><small>{person?.card_summary.offering.slice(0, 2).join(" · ")}</small></span><time>{relativeTime(encounter.last_interaction_at)}</time></div>; })}</section>
       </aside>
     </main>
@@ -224,7 +225,7 @@ export default function App() {
     <Route path="/kin" element={session ? <AppShell session={session}><KinPage session={session} /></AppShell> : <Navigate to="/login" replace />} />
     <Route path="/kin/:relationshipId" element={session ? <AppShell session={session}><KinDetailPage session={session} /></AppShell> : <Navigate to="/login" replace />} />
     <Route path="/campfire" element={session ? <AppShell session={session}><CampfirePage session={session} /></AppShell> : <Navigate to="/login" replace />} />
-    <Route path="/signals" element={session ? <AppShell session={session}><SignalsPage /></AppShell> : <Navigate to="/login" replace />} />
+    <Route path="/signals" element={<Navigate to={appPath("/ask")} replace />} />
     <Route path="/me" element={session ? <AppShell session={session}><MePage session={session} /></AppShell> : <Navigate to="/login" replace />} />
     <Route path="*" element={<Navigate to={session ? "/today" : "/login"} replace />} />
   </Routes>;

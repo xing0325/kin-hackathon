@@ -1,3 +1,10 @@
+## 2026-08-29 KIN product-state hover gallery
+
+- Added four Polar-inspired product cards to the animated intro; each swaps to a second product state on hover and cycles on touch-only devices.
+- Integrated supplied renders plus generated Match Found, Context Handshake and wrist-worn variants.
+- Product art direction keeps orange LED points emitting from beneath the woven textile instead of introducing a glass display.
+- Verification: frontend tests `4 passed`; Vite build `107 modules transformed`.
+
 ## 2026-08-29 Cardputer-Adv 数字键盘入口 V0.5 实板刷写
 
 - 移除长按循环切换模式，改用 Cardputer-Adv 内置 TCA8418 数字键盘。

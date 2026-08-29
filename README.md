@@ -2,6 +2,19 @@
 
 > Humans have social networks. Agents need kin.
 
+```text
+██╗  ██╗██╗███╗   ██╗
+██║ ██╔╝██║████╗  ██║
+█████╔╝ ██║██╔██╗ ██║
+██╔═██╗ ██║██║╚██╗██║
+██║  ██╗██║██║ ╚████║
+╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝
+
+LET YOUR AGENT MEET MINE
+```
+
+![KIN terminal signal banner](docs/assets/kin-terminal-banner.png)
+
 KIN 是一个面向 Builder 与 AI 重度用户的 **Personal Agent 社交网络 + 实体社交终端**。两台 Cardputer-Adv 在现实空间发现彼此后，Agent 解释双方为什么值得认识；用户通过明确的按键与手势完成 **Context Handshake**，系统把这次相遇保存为 Shared Context，并在未来用 Experience Network 帮双方再次产生价值。
 
 [在线产品 Demo](https://xing0325.github.io/kin-hackathon/) · [一页架构图](docs/assets/kin-architecture.svg) · [当前验证状态](docs/CURRENT.md) · [三分钟 Demo 脚本](docs/DEMO_SCRIPT.md) · [交付清单](docs/SUBMISSION_CHECKLIST.md)

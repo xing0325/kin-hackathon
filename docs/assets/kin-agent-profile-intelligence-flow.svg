@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="760" viewBox="0 0 1440 760" role="img" aria-labelledby="title desc">
+  <title id="title">KIN Agent Profile Intelligence 工作框架</title>
+  <desc id="desc">网页 Chatbot 历史与本地 Agent 历史配置经过本地采集、隐私过滤、画像分析、用户确认，最终用于双人匹配、合作建议与 Context Handshake。</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#090b10"/><stop offset="1" stop-color="#16100b"/></linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#ff7a18"/><stop offset="1" stop-color="#ffb15c"/></linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#ff9a3d"/></marker>
+    <style>
+      .title{font:700 32px system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;fill:#fff}
+      .sub{font:500 16px system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;fill:#a9afbb}
+      .step{font:700 18px system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;fill:#ff9a3d}
+      .head{font:700 21px system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;fill:#fff}
+      .body{font:500 15px system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;fill:#d5d9e1}
+      .minor{font:500 13px system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;fill:#9299a6}
+      .box{fill:#14171e;stroke:#373c47;stroke-width:1.5}
+      .hot{fill:#1d1712;stroke:#ff8b2b;stroke-width:2}
+      .arrow{fill:none;stroke:#ff9a3d;stroke-width:3;marker-end:url(#arrow)}
+      .thin{fill:none;stroke:#626977;stroke-width:2;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect width="1440" height="760" rx="26" fill="url(#bg)"/>
+  <text x="64" y="66" class="title">KIN Agent 工作框架</text>
+  <text x="64" y="96" class="sub">Profile Intelligence · 从本地数据到可解释匹配与 Context Handshake</text>
+
+  <text x="64" y="148" class="step">01  两类输入 · INPUTS</text>
+  <rect x="64" y="172" width="270" height="150" rx="18" class="box"/>
+  <text x="88" y="207" class="head">网页 Chatbot 历史</text>
+  <text x="88" y="235" class="minor">Web Conversation History</text>
+  <text x="88" y="269" class="body">ChatGPT · Claude · Gemini</text>
+  <text x="88" y="294" class="body">DeepSeek · 豆包</text>
+
+  <rect x="64" y="346" width="270" height="190" rx="18" class="box"/>
+  <text x="88" y="381" class="head">本地 Agent 历史 + 配置</text>
+  <text x="88" y="409" class="minor">Local Agent History &amp; Config</text>
+  <text x="88" y="443" class="body">JSON / JSONL / SQLite</text>
+  <text x="88" y="468" class="body">Model · Token · Harness</text>
+  <text x="88" y="493" class="body">Skill · Plugin · MCP</text>
+  <text x="88" y="518" class="body">自创 Skill · Git / Build 信号</text>
+
+  <text x="388" y="148" class="step">02  本地采集 · CAPTURE</text>
+  <rect x="388" y="172" width="270" height="364" rx="18" class="hot"/>
+  <text x="412" y="212" class="head">Local-first Collector</text>
+  <text x="412" y="246" class="body">Conversation Collector</text>
+  <text x="412" y="273" class="body">Agent Scanner</text>
+  <path d="M412 296 H634" stroke="#3c404a"/>
+  <text x="412" y="330" class="body">合并两类历史输入</text>
+  <text x="412" y="357" class="body">标准化模型与工具记录</text>
+  <text x="412" y="384" class="body">过滤 Token / Credential / URL</text>
+  <text x="412" y="411" class="body">Raw Conversation 不上传</text>
+  <rect x="412" y="447" width="222" height="60" rx="12" fill="#282016"/>
+  <text x="523" y="472" text-anchor="middle" class="body">本地数据仓库</text>
+  <text x="523" y="494" text-anchor="middle" class="minor">Raw Data Stays Local</text>
+
+  <text x="712" y="148" class="step">03  分析与确认 · ANALYZE</text>
+  <rect x="712" y="172" width="306" height="364" rx="18" class="box"/>
+  <text x="736" y="212" class="head">Profile Intelligence</text>
+  <text x="736" y="247" class="body">行为：交付 · 探索 · 协作 · 工程深度</text>
+  <text x="736" y="276" class="body">模型：调用次数与 Token 用量</text>
+  <text x="736" y="305" class="body">偏好：Favorite Model / Harness</text>
+  <text x="736" y="334" class="body">工具：Skill / Plugin / MCP 频次</text>
+  <text x="736" y="363" class="body">资产：自创 Skill 与项目领域</text>
+  <path d="M736 389 H994" stroke="#3c404a"/>
+  <text x="736" y="424" class="head">VBTI Candidate</text>
+  <text x="736" y="452" class="minor">Ship–Polish · Prompt–Engineer</text>
+  <text x="736" y="476" class="minor">Explore–eXecute · Collab–Solo</text>
+  <rect x="736" y="493" width="258" height="24" rx="12" fill="url(#accent)" opacity=".9"/>
+  <text x="865" y="510" text-anchor="middle" style="font:700 13px system-ui;fill:#1b1108">用户 Approve / Ignore</text>
+
+  <text x="1072" y="148" class="step">04  匹配与连接 · MATCH</text>
+  <rect x="1072" y="172" width="304" height="364" rx="18" class="hot"/>
+  <text x="1096" y="212" class="head">Explainable Match</text>
+  <text x="1096" y="247" class="body">语义相关度</text>
+  <text x="1096" y="274" class="body">需求—技能互补</text>
+  <text x="1096" y="301" class="body">共同兴趣与经验</text>
+  <text x="1096" y="328" class="body">VBTI Chemistry</text>
+  <text x="1096" y="355" class="body">工作方式契合度</text>
+  <path d="M1096 380 H1352" stroke="#5d4633"/>
+  <text x="1096" y="416" class="body">Overall Match Score</text>
+  <text x="1096" y="443" class="body">WHY YOU MATCH</text>
+  <text x="1096" y="470" class="body">合作方式推荐</text>
+  <text x="1096" y="497" class="body">Context Handshake</text>
+
+  <path d="M334 247 H377" class="thin"/>
+  <path d="M334 442 H377" class="thin"/>
+  <path d="M658 354 H701" class="arrow"/>
+  <path d="M1018 354 H1061" class="arrow"/>
+
+  <rect x="388" y="606" width="988" height="92" rx="18" fill="#12151b" stroke="#343945"/>
+  <text x="412" y="641" class="head">最终结果 · OUTPUT</text>
+  <text x="412" y="673" class="body">Builder Profile → 匹配分数与解释 → Pair Building / 快速原型 / Debug Rescue / 黑客松组队 → Shared Context &amp; Relationship Memory</text>
+  <path d="M1224 536 V595" class="arrow"/>
+  <circle cx="1324" cy="59" r="18" fill="#ff8b2b" filter="url(#glow)"/><text x="1324" y="65" text-anchor="middle" style="font:800 18px system-ui;fill:#111">K</text>
+</svg>

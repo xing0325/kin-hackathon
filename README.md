@@ -10,6 +10,14 @@ KIN 是一个面向 Builder 与 AI 重度用户的 **Personal Agent 社交网络
 
 ![KIN Physical AI architecture](docs/assets/kin-architecture.svg)
 
+## KIN Agent 如何工作
+
+![KIN Agent Profile Intelligence 工作框架](docs/assets/kin-agent-profile-intelligence-flow.svg)
+
+KIN Agent 接收两类本地输入：**网页 Chatbot 历史**，以及**本地 Agent 的历史、配置与使用记录**。Conversation Collector 和 Agent Scanner 在本地完成合并、标准化与隐私过滤，不上传原始聊天、Prompt、凭据或完整配置。
+
+系统据此生成 Builder 的行为指标、模型与 Token 使用情况、Favorite Model、Harness、Skill、Plugin、MCP 和自创 Skill 偏好，并形成待用户确认的 **VBTI Candidate**。用户 Approve 后，画像进入 Builder Profile；两个人相遇时，匹配引擎综合语义相关度、需求—技能互补、共同兴趣与经验、VBTI Chemistry 和工作方式，输出 `Overall Match Score`、`WHY YOU MATCH` 与合作方式建议，再由双方完成 Context Handshake。
+
 ## 核心 Physical AI 闭环
 
 ```text

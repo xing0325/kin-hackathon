@@ -10,7 +10,7 @@ import { MePage } from "./me";
 import { CampfirePage } from "./campfire";
 import { SignalsPage } from "./signals";
 import type { AttentionItem, NotificationItem, OnboardingDraft, SessionData, TodayData } from "./types";
-import { connectKinDevice } from "./mobileBle";
+import { connectKinDevices } from "./mobileBle";
 
 const Icon = ({ children }: { children: ReactNode }) => <span className="nav-icon" aria-hidden="true">{children}</span>;
 
@@ -160,6 +160,7 @@ function TodayPage({ session }: { session: SessionData }) {
   const [proactive, setProactive] = useState<import("./types").ProactiveItem[]>([]);
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [error, setError] = useState("");
+  const [bleStatus, setBleStatus] = useState("未连接设备");
   useEffect(() => {
     api.today().then(setToday).catch((reason) => setError(reason.message));
     api.proactive().then(setProactive).catch(() => setProactive([]));
@@ -173,10 +174,12 @@ function TodayPage({ session }: { session: SessionData }) {
   if (error) return <AppShell session={session}><div className="state-page"><h2>Today 暂时没有加载</h2><p>{error}</p></div></AppShell>;
   if (!today) return <AppShell session={session}><div className="loading-screen">Agent 正在整理今天值得你注意的事…</div></AppShell>;
   const unreadCount = notifications.filter((item) => !item.read_at).length;
-  const [bleStatus, setBleStatus] = useState("未连接设备");
   async function connectWearable() {
-    try { const device = await connectKinDevice((text) => setBleStatus(text)); setBleStatus(`${device.name} 已连接`); }
-    catch (reason) { setBleStatus(reason instanceof Error ? reason.message : "蓝牙连接失败"); }
+    try {
+      setBleStatus("请选择第 1 台 KIN 设备…");
+      const devices = await connectKinDevices(2, (text, connected) => setBleStatus(`${text} · ${connected}/2`));
+      setBleStatus(`${devices.names.join(" + ")} · MATCH READY`);
+    } catch (reason) { setBleStatus(reason instanceof Error ? reason.message : "蓝牙连接失败"); }
   }
   return <AppShell session={session} badge={openCount + unreadCount}>
     <header className="topbar"><div><p className="eyebrow">{today.day} · SHANGHAI</p><h1>今天，{session.agent_name} 发现了这些。</h1></div><div className={`agent-online ${today.observation.connected ? "connected" : ""}`}><i /><span>{observationCopy(today)}<small>LAST SCAN · {relativeTime(today.observation.last_scan_at)}</small></span></div></header>
@@ -197,7 +200,7 @@ function TodayPage({ session }: { session: SessionData }) {
           </article>)}
         </section>}
         {proactive.length > 0 && <section className="proactive-card"><p className="eyebrow">PROACTIVE AGENT · {proactive[0].kind.toUpperCase()}</p><h2>{proactive[0].title}</h2><p>{proactive[0].body}</p>{proactive[0].action.href && <Link to={appPath(proactive[0].action.href)}>{proactive[0].action.label ?? "查看"} →</Link>}</section>}
-        <section className="goal-card"><p className="eyebrow">PHONE BRIDGE · BLUETOOTH</p><h2>{bleStatus}</h2><button className="button primary" onClick={() => void connectWearable()}>连接 KIN 设备 →</button></section>
+        <section className="goal-card"><p className="eyebrow">PHONE BRIDGE · BLUETOOTH</p><h2>{bleStatus}</h2><button className="button primary" onClick={() => void connectWearable()}>连接两台 KIN 设备 →</button><small>Android Chrome 会连续请求两台设备的蓝牙权限。</small></section>
         <section className="goal-card"><p className="eyebrow">CURRENT NETWORK GOAL</p><h2>{today.network_goal?.goal_text ?? "还没有设置 Network Goal"}</h2><button>调整目标 →</button></section>
         <section className="brief-card"><div><b>{today.brief.encounter_count}</b><span>ENCOUNTERS</span></div><div><b>{today.brief.activity_count}</b><span>AGENT ACTIONS</span></div><div><b>{today.card_completion.percent}%</b><span>PROFILE</span></div></section>
         <section className="encounter-list"><div className="section-heading"><span>RECENT KIN</span></div>{today.encounters.map((encounter) => { const person = today.agent_contexts[encounter.peer_agent_id]; return <div className="encounter" key={encounter.peer_agent_id}><div className="avatar">{person?.identity_assertion.display_name.slice(0, 1) ?? "K"}</div><span><b>{person?.identity_assertion.display_name ?? "Unknown Kin"}</b><small>{person?.card_summary.offering.slice(0, 2).join(" · ")}</small></span><time>{relativeTime(encounter.last_interaction_at)}</time></div>; })}</section>

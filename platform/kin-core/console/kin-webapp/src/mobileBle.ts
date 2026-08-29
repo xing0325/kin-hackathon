@@ -27,3 +27,13 @@ export async function connectKinDevice(onText?: (text: string) => void): Promise
   await command.writeValue(new Uint8Array([0x33, 0x01]));
   return { name: device.name ?? "KIN device", disconnect: () => device.gatt?.disconnect?.() };
 }
+
+export async function connectKinDevices(count = 2, onText?: (text: string, connected: number) => void): Promise<{ names: string[]; disconnect: () => void }> {
+  const devices: Array<{ name: string; disconnect: () => void }> = [];
+  for (let index = 0; index < count; index += 1) {
+    const device = await connectKinDevice((text) => onText?.(text, devices.length));
+    devices.push(device);
+    onText?.(`${device.name} 已连接`, devices.length);
+  }
+  return { names: devices.map((device) => device.name), disconnect: () => devices.forEach((device) => device.disconnect()) };
+}

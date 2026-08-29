@@ -969,3 +969,70 @@ Next action:
 - 使用 Web Bluetooth 连接 Agent_link `0xFFC0`，订阅事件 `0xFFC4`，写入控制特征 `0xFFC1`；支持 Android Chrome 的前台连接和设备状态回显。
 - Web 用户端测试 `21 passed`，Vite build `51 modules transformed`。
 - 真实产品流程仍需手机在线：手机负责 BLE/GATT 桥接，后端负责匹配、Context 权限和 Shared Context；网页本身不提供离线配对。
+
+## 2026-08-29 KIN Profile Intelligence Skill V0.5 — dual history inputs
+
+- 支持第二个历史输入 `kin-agent-export`（`sessions`），与网页端 `kin-conversation-export` 合并后统一生成候选。
+- CLI 新增 `--agent-history`；网页 chatbot 历史与本地 Agent 历史/配置现在具备明确输入契约。
+- 验证：`DUAL_INPUT_TEST_RESULT: PASS`，脚本与测试 py_compile 通过。
+
+## 2026-08-29 KIN UIUX readability pass V0.2
+
+What changed:
+
+- 在 `platform/kin-core/console/kin-webapp/src/style.css` 增加 KIN 语义字号 token（11/13/15/18px）和统一 focus ring。
+- 提高正文、匹配解释、卡片操作、导航标签与移动端触控目标字号；移动端正文统一至少 16px。
+- 保留 KIN 暗色/橙色信号视觉，不引入企业后台默认皮肤。
+
+What is verified:
+
+- `npm test`：21 passed。
+- `npm run build`：51 modules transformed，构建成功。
+- 运行地址保持 `http://localhost:4174/today?demo=1`。
+- 修改包与可执行回滚脚本：`outputs/kin-uiux-readability-v0.2/`。
+
+Next action:
+
+- 继续将 AppShell、MatchCard、HandshakePanel 收敛为 Radix 行为 primitives + KIN tokens，并做一次桌面/移动端实视验收。
+
+## 2026-08-29 KIN UIUX shell refresh V0.3
+
+What changed:
+
+- AppShell 桌面侧栏改为 220px 带文字导航，激活态增加清晰背景与橙色指示。
+- Today 改为首张主卡横跨布局、次级卡片收敛；降低顶部留白并提升信息层级。
+- Radar 桌面列表和移动端断点重新排版；移动端隐藏次要解释列，保留人物、标签和匹配分数。
+- 移动端底部导航与触控目标统一到 70px。
+
+What is verified:
+
+- `npm test`：21 passed。
+- `npm run build`：51 modules transformed，构建成功。
+- 修改包与回滚脚本：`outputs/kin-uiux-shell-v0.3/`。
+
+## 2026-08-29 KIN Profile Intelligence Skill V0.6 — local Agent SQLite adapter
+
+- 新增 `--agent-sqlite`：以只读模式读取显式指定的 Agent `thread_items.item_json`，按 thread 归一化为 `kin-agent-export`；失败或锁定时返回空历史，不影响网页 Collector 输入。
+- 不输出原始消息；原文仅在本地进程内用于指标计算。
+- 验证：`SQLITE_AGENT_SCAN_TEST_RESULT: PASS`，脚本 py_compile 通过。
+
+## 2026-08-29 KIN user web blank-screen fix V0.4
+
+What changed:
+
+- 修复 `TodayPage` 条件 return 之前声明 `useState` 导致的 React hook 顺序错误；该错误会在数据从 loading 切换到 ready 时触发黑屏。
+- `bleStatus` 状态现在在所有 render 路径保持稳定声明。
+
+What is verified:
+
+- `npm test`：21 passed。
+- `npm run build`：通过。
+- `http://localhost:4174/today?demo=1` HTTP 200。
+- 回滚与验证材料：`outputs/kin-user-black-screen-fix-v0.4/`。
+
+## 2026-08-29 手机双设备连接流程 V0.2
+
+- Android Chrome Phone Bridge 从单设备连接升级为连续连接两台 Cardputer-Adv。
+- Today 页面按钮改为 `连接两台 KIN 设备`，逐台请求蓝牙权限并显示 `1/2`、`2/2`、`MATCH READY` 状态。
+- Web Bluetooth 仍需 HTTPS、Chrome 前台；后端继续负责 Agent_link 事件、匹配和 Shared Context。
+- 验证：用户端 `21 passed`，Vite build `51 modules transformed`。

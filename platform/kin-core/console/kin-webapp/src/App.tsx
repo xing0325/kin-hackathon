@@ -179,7 +179,8 @@ function TodayPage({ session }: { session: SessionData }) {
     try {
       setBleStatus("请选择第 1 台 KIN 设备…");
       const devices = await connectKinDevices(2, setBleStatus);
-      setBleStatus(`${devices.names.join(" + ")} · 匹配度 READY`);
+      bleBridge.current = devices;
+      setBleStatus(`${devices.names.join(" + ")} · 已连接，请两台按 1`);
     } catch (reason) { setBleStatus(reason instanceof Error ? reason.message : "蓝牙连接失败"); }
   }
   return <AppShell session={session} badge={openCount + unreadCount}>

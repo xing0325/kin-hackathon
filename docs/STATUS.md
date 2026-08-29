@@ -1,15 +1,15 @@
-## 2026-08-29 Product gallery spacing pass
-
-- Reworked product gallery into spacious editorial rows with alternating image/copy columns and larger responsive gutters.
-- Hover remains active across the entire card; text no longer overlays or competes with the product image.
-- Existing generated artwork and under-weave LED visual treatment are unchanged.
-- Verification: frontend tests `4 passed`; Vite build `107 modules transformed`.
-
 ## 2026-08-29 Generated KIN artwork integration
 
 - Added a wide negative-space Hero product image and integrated generated woven-light macro and inner technical renders into the product gallery.
 - Image states keep LED points visibly emitting through the textile; cards retain whole-card hover swapping.
 - Verification: frontend tests `4 passed`; Vite build `107 modules transformed`.
+
+## 2026-08-29 KIN Profile Intelligence Skill V0.1
+
+- 新增 `tools/kin_profile_intelligence.py`：本地消费 Collector export 与用户选择的 Agent 配置摘要，输出 profile indicators、VBTI candidate、Agent stack fingerprints 与本地证据。
+- 输出明确不包含 raw messages 或 config values；VBTI 保持 `candidate`，不自动覆盖 Current VBTI。
+- 新增 `platform/kin-core/skills/kin-profile-intelligence/SKILL.md`，定义本地优先调用契约。
+- 验证：baseline/modified py_compile、sanitized behavior test、rollback copy restore 均 PASS。
 
 ## 2026-08-29 KIN product-state hover gallery
 
@@ -943,3 +943,29 @@ Next action:
 Next action:
 
 - 若采用该方向，将玻璃纹理降级为 Radar / Handshake 的状态层，并用真实 Match / Handshake 事件驱动 shader 参数，避免作为全站常驻装饰。
+
+## 2026-08-29 KIN Profile Intelligence Skill V0.2
+
+- 扩展本地候选输出：按模型统计 calls/input_tokens/output_tokens/total_tokens，识别 favorite model，统计 harness、skill、plugin 调用频次并记录 custom skills。
+- 增加可抓取信号目录：模型路由、上下文窗口偏好、工具调用模式、隐私分享偏好、项目领域标签、shipping/Git 信号。
+- 验证：usage fixture 输出 `PROFILE_USAGE_TEST_RESULT: PASS`；脚本与测试文件 py_compile 通过。
+
+## 2026-08-29 KIN Profile Intelligence Skill V0.3
+
+- 新增显式 `--inventory-root` 扫描：只读取选定目录的 SKILL.md 文件名和 usage*.json/jsonl 中的规范化 usage 字段，可发现自创 Skill 与模型/harness/skill/plugin 使用记录。
+- 不默认扫描用户 Home；不读取 arbitrary config 内容，不输出 secrets 或 raw payload。
+- 验证：`INVENTORY_SCAN_TEST_RESULT: PASS`。
+
+## 2026-08-29 KIN Profile Intelligence API V0.4
+
+- 新增 `profile_intelligence_candidates` 持久化模型与 migration `0005_profile_intelligence.sql`。
+- 新增 `POST/GET /v1/profile-intelligence/candidates` 与显式 approve/ignore decision endpoint；仅接受 `local_only=true` 且 `raw_messages_emitted=0` 的候选。
+- FastAPI 回归：`apps/api/.venv/bin/python -m pytest -q apps/api/tests/test_api.py`，16 passed。
+- ORM/schema/main 编译通过：`API_PROFILE_INTELLIGENCE_COMPILE_RESULT: PASS`。
+
+## 2026-08-29 Android Chrome 手机蓝牙桥接 V0.1
+
+- 用户端新增 Phone Bridge 卡片和 `连接 KIN 设备` 操作。
+- 使用 Web Bluetooth 连接 Agent_link `0xFFC0`，订阅事件 `0xFFC4`，写入控制特征 `0xFFC1`；支持 Android Chrome 的前台连接和设备状态回显。
+- Web 用户端测试 `21 passed`，Vite build `51 modules transformed`。
+- 真实产品流程仍需手机在线：手机负责 BLE/GATT 桥接，后端负责匹配、Context 权限和 Shared Context；网页本身不提供离线配对。

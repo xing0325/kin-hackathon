@@ -1,0 +1,2 @@
+ALTER TABLE agent_profiles ADD COLUMN IF NOT EXISTS intelligence_json TEXT NOT NULL DEFAULT '{}';
+ALTER TABLE agent_profiles ADD COLUMN IF NOT EXISTS vbti_code VARCHAR(8) NULL;

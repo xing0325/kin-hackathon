@@ -37,6 +37,8 @@ class ProfileInput(ApiModel):
 
 class ProfileView(ProfileInput):
     user_id: str
+    intelligence: Dict[str, Any] = Field(default_factory=dict)
+    vbti_code: Optional[str] = None
 
 
 class UserView(ApiModel):
@@ -86,6 +88,8 @@ class PresenceView(ApiModel):
 
 class MatchView(ApiModel):
     id: str
+    vbti_compatibility: Optional[float] = None
+    recommended_modes: List[str] = Field(default_factory=list)
     user_a_id: str
     user_b_id: str
     score: float
@@ -229,6 +233,23 @@ class CandidateView(ApiModel):
     owner_id: str
     artifact: Dict[str, Any]
     source: Dict[str, Any]
+    status: str
+    created_at: datetime
+
+
+class ProfileIntelligenceInput(ApiModel):
+    candidate: Dict[str, Any]
+
+
+class ProfileIntelligenceDecision(ApiModel):
+    decision: str = Field(pattern=r"^(approve|ignore)$")
+    idempotency_key: str = Field(min_length=8, max_length=128)
+
+
+class ProfileIntelligenceView(ApiModel):
+    id: str
+    owner_id: str
+    candidate: Dict[str, Any]
     status: str
     created_at: datetime
 

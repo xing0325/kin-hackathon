@@ -10,7 +10,6 @@ import glassSource from "./shaders/glassShading.frag?raw";
 import initializeSource from "./shaders/initializePressure.frag?raw";
 import reactionSource from "./shaders/reactionDiffusion.frag?raw";
 import correctionSource from "./shaders/velocityCorrection.frag?raw";
-import logoUrl from "../assets/kin-logo-cropped.jpg";
 import divergenceSource from "./shaders/velocityToPressure.frag?raw";
 
 const includeUtilities = (source) => source.replace("#include ./util.glsl", utilSource);
@@ -174,9 +173,6 @@ export class FluidGlassField {
     this.maskContext = this.maskCanvas.getContext("2d");
     this.maskTexture = new Texture(this.gl);
     this.maskTexture.image = this.maskCanvas;
-    this.logoImage = new Image();
-    this.logoImage.onload = () => { this.logoReady = true; this.renderWordMask(this.simulationSize?.[0] ?? 512, this.simulationSize?.[1] ?? 512); };
-    this.logoImage.src = logoUrl;
   }
 
   bind() {
@@ -244,33 +240,9 @@ export class FluidGlassField {
     }
     ctx.restore();
 
-    if (this.logoReady) {
-      // Separate the supplied icon from the wordmark: the icon remains a
-      // liquid-glass object while KIN gets a larger, clearer typographic mask.
-      const iconSize = size * (compact ? 0.72 : 0.58);
-      const iconW = iconSize * 0.88;
-      const iconH = iconSize * 0.62;
-      const imageCanvas = document.createElement("canvas");
-      imageCanvas.width = Math.max(1, Math.round(iconW));
-      imageCanvas.height = Math.max(1, Math.round(iconH));
-      const imageCtx = imageCanvas.getContext("2d");
-      imageCtx.drawImage(this.logoImage, 0, 0, this.logoImage.naturalWidth, Math.round(this.logoImage.naturalHeight * 0.59), 0, 0, imageCanvas.width, imageCanvas.height);
-      const pixels = imageCtx.getImageData(0, 0, imageCanvas.width, imageCanvas.height);
-      for (let i = 0; i < pixels.data.length; i += 4) {
-        const luminance = (pixels.data[i] + pixels.data[i + 1] + pixels.data[i + 2]) / 3;
-        const alpha = Math.max(0, Math.min(255, (luminance - 34) * 1.9));
-        pixels.data[i] = 255; pixels.data[i + 1] = 0; pixels.data[i + 2] = 0; pixels.data[i + 3] = alpha;
-      }
-      imageCtx.putImageData(pixels, 0, 0);
-      ctx.drawImage(imageCanvas, focalX - iconW / 2, focalY - size * 0.48, iconW, iconH);
-      ctx.font = `800 ${Math.round(size * (compact ? 0.78 : 0.66))}px Inter, Arial, sans-serif`;
-      if ("letterSpacing" in ctx) ctx.letterSpacing = `${Math.round(size * 0.08)}px`;
-      ctx.fillText(this.options.word, focalX, focalY + size * 0.34);
-    } else {
-      ctx.font = `800 ${Math.round(size)}px Inter, Arial, sans-serif`;
-      if ("letterSpacing" in ctx) ctx.letterSpacing = `${Math.round(size * 0.07)}px`;
-      ctx.fillText(this.options.word, focalX, focalY);
-    }
+    ctx.font = `800 ${Math.round(size)}px Inter, Arial, sans-serif`;
+    if ("letterSpacing" in ctx) ctx.letterSpacing = `${Math.round(size * 0.07)}px`;
+    ctx.fillText(this.options.word, focalX, focalY);
     if ("letterSpacing" in ctx) ctx.letterSpacing = `${Math.max(2, Math.round(size * 0.025))}px`;
     ctx.font = `500 ${Math.max(10, Math.round(size * 0.071))}px "DM Mono", monospace`;
     ctx.fillStyle = "rgba(255, 0, 0, 0.66)";

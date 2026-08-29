@@ -67,6 +67,8 @@ def profile_to_dict(profile: Optional[AgentProfile]) -> Dict[str, Any]:
             "ai_stack": [],
             "public_summary": "",
             "visibility": "event",
+            "intelligence": {},
+            "vbti_code": None,
         }
     return {
         "user_id": profile.user_id,
@@ -77,6 +79,8 @@ def profile_to_dict(profile: Optional[AgentProfile]) -> Dict[str, Any]:
         "ai_stack": loads(profile.ai_stack_json, []),
         "public_summary": profile.public_summary,
         "visibility": profile.visibility,
+        "intelligence": loads(profile.intelligence_json, {}),
+        "vbti_code": profile.vbti_code,
     }
 
 
@@ -139,6 +143,15 @@ def score_profiles(left: AgentProfile, right: AgentProfile) -> Tuple[float, List
     if not reasons:
         reasons.append("双方当前项目和经验存在语义关联")
     return round(max(score, 0.05), 4), reasons[:3]
+
+
+def vbti_chemistry(left: Optional[str], right: Optional[str]) -> Tuple[Optional[float], List[str]]:
+    if not left or not right or len(left) != 4 or len(right) != 4:
+        return None, []
+    diff = sum(a != b for a, b in zip(left.upper(), right.upper()))
+    compatibility = round(1.0 - diff / 4.0, 4)
+    modes = {0: ["同频协作", "共同交付"], 1: ["Pair Building", "快速原型"], 2: ["黄金补位", "Prototype Sprint", "Debug Rescue"], 3: ["Hackathon teammate", "互补分工"], 4: ["跨风格协作", "先定义 Done 标准"]}[diff]
+    return compatibility, modes
 
 
 def ensure_match(db: Session, user_a_id: str, user_b_id: str, ttl_minutes: int = 15) -> MatchCandidate:

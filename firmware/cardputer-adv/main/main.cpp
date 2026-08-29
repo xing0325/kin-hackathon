@@ -80,6 +80,21 @@ void DrawUi(const char* text) {
     } else if (text && std::strstr(text, "OFFLINE")) {
         title = "Offline";
         detail = "Keep gateway open";
+    } else if (text && std::strstr(text, "KIN LINK")) {
+        title = "KIN Link";
+        detail = "Scan + handshake";
+    } else if (text && std::strstr(text, "CAMPFIRE")) {
+        title = "Campfire";
+        detail = "Build together";
+    } else if (text && std::strstr(text, "ASK ROOM")) {
+        title = "Ask the room";
+        detail = "Broadcast a need";
+    } else if (text && std::strstr(text, "PROFILE")) {
+        title = "Profile";
+        detail = "Builder context";
+    } else if (text && std::strstr(text, "KIN HOME")) {
+        title = "KIN Home";
+        detail = "Press 1-4 to choose";
     }
 
     M5.Display.fillScreen(TFT_BLACK);
@@ -247,7 +262,7 @@ void InputTask(void*) {
     while (true) {
         M5.update();
         const uint8_t number_key = g_keyboard.pressedNumber();
-        if (number_key) HandleNumberKey(number_key);
+        if (number_key) { ESP_LOGI(kTag, "numeric key=%u", unsigned(number_key)); HandleNumberKey(number_key); }
         if (M5.BtnA.wasPressed()) PushButtonEvent();
 
         float ax = 0, ay = 0, az = 0;

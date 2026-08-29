@@ -30,6 +30,7 @@ from .models import (
     NeedSignal,
     Notification,
     PresenceSession,
+    ProfileIntelligenceCandidate,
     ProactiveItem,
     Relationship,
     Signal,
@@ -66,6 +67,9 @@ from .schemas import (
     PresenceView,
     ProactiveView,
     ProfileInput,
+    ProfileIntelligenceDecision,
+    ProfileIntelligenceInput,
+    ProfileIntelligenceView,
     ProfileView,
     RelationshipView,
     SignalInput,
@@ -77,6 +81,7 @@ from .observability import prometheus_text, request_finished, request_started
 from .seed import seed_demo
 from .services import (
     build_experience_matches,
+    vbti_chemistry,
     confirm_handshake,
     create_experience,
     create_need,
@@ -155,8 +160,11 @@ def match_view(db: Session, match: MatchCandidate, viewer_id: str) -> MatchView:
     peer_id = match.user_b_id if viewer_id == match.user_a_id else match.user_a_id
     peer = db.get(User, peer_id)
     peer_profile = db.get(AgentProfile, peer_id) if peer else None
+    viewer_profile = db.get(AgentProfile, viewer_id)
+    chemistry, modes = vbti_chemistry(viewer_profile.vbti_code if viewer_profile else None, peer_profile.vbti_code if peer_profile else None)
     return MatchView(
         id=match.id, user_a_id=match.user_a_id, user_b_id=match.user_b_id,
+        vbti_compatibility=chemistry, recommended_modes=modes,
         score=match.score, reasons=loads(match.reason_json, []), status=match.status,
         expires_at=match.expires_at,
         peer={
@@ -591,6 +599,41 @@ def decide_candidate(
     ))
     db.commit(); db.refresh(item)
     return candidate_view(item)
+
+
+@app.post("/v1/profile-intelligence/candidates", response_model=ProfileIntelligenceView)
+def ingest_profile_intelligence(payload: ProfileIntelligenceInput, user: User = Depends(get_current_user), db: Session = Depends(get_db)) -> ProfileIntelligenceView:
+    candidate = payload.candidate
+    if candidate.get("privacy", {}).get("raw_messages_emitted") != 0 or candidate.get("privacy", {}).get("local_only") is not True:
+        raise HTTPException(status_code=400, detail="candidate must be local-only and summary-only")
+    item = ProfileIntelligenceCandidate(id=new_id("pic"), owner_id=user.id, candidate_json=dumps(candidate), status="pending")
+    db.add(item); db.commit(); db.refresh(item)
+    return ProfileIntelligenceView(id=item.id, owner_id=item.owner_id, candidate=loads(item.candidate_json, {}), status=item.status, created_at=item.created_at)
+
+
+@app.get("/v1/profile-intelligence/candidates", response_model=List[ProfileIntelligenceView])
+def list_profile_intelligence(user: User = Depends(get_current_user), db: Session = Depends(get_db)) -> List[ProfileIntelligenceView]:
+    rows = db.scalars(select(ProfileIntelligenceCandidate).where(ProfileIntelligenceCandidate.owner_id == user.id).order_by(ProfileIntelligenceCandidate.created_at.desc())).all()
+    return [ProfileIntelligenceView(id=x.id, owner_id=x.owner_id, candidate=loads(x.candidate_json, {}), status=x.status, created_at=x.created_at) for x in rows]
+
+
+@app.post("/v1/profile-intelligence/candidates/{candidate_id}/decision", response_model=ProfileIntelligenceView)
+def decide_profile_intelligence(candidate_id: str, payload: ProfileIntelligenceDecision, user: User = Depends(get_current_user), db: Session = Depends(get_db)) -> ProfileIntelligenceView:
+    item = db.get(ProfileIntelligenceCandidate, candidate_id)
+    if not item or item.owner_id != user.id: raise HTTPException(status_code=404, detail="candidate not found")
+    if item.status != "pending": raise HTTPException(status_code=409, detail="candidate already decided")
+    item.status = "approved" if payload.decision == "approve" else "ignored"
+    if payload.decision == "approve":
+        profile = db.get(AgentProfile, user.id)
+        candidate = loads(item.candidate_json, {})
+        if profile:
+            profile.intelligence_json = dumps(candidate.get("profile_indicators", {}))
+            code = candidate.get("vbti_candidate", {}).get("code")
+            if isinstance(code, str) and len(code) == 4:
+                profile.vbti_code = code.upper()
+            db.add(profile)
+    db.add(item); db.commit(); db.refresh(item)
+    return ProfileIntelligenceView(id=item.id, owner_id=item.owner_id, candidate=loads(item.candidate_json, {}), status=item.status, created_at=item.created_at)
 
 
 @app.post("/v1/campfires", response_model=CampfireView)

@@ -5,7 +5,6 @@ on:
     branches: [main]
     paths:
       - "platform/kin-core/console/kin-webapp/**"
-      - "apps/web/**"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
@@ -21,37 +20,28 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: platform/kin-core/console/kin-webapp
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Build user demo
-        working-directory: platform/kin-core/console/kin-webapp
-        run: |
-          npm ci
-          npm test
-          npm run build
-          cp dist/index.html dist/404.html
+          cache: npm
+          cache-dependency-path: platform/kin-core/console/kin-webapp/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
         env:
           VITE_KIN_DEMO: "1"
           VITE_KIN_HASH_ROUTER: "1"
-      - name: Build animated intro site
-        working-directory: apps/web
-        run: |
-          npm ci
-          npm test
-          npm run build -- --base=/kin-hackathon/brand/
-      - name: Assemble Pages artifact
-        run: |
-          rm -rf pages-dist
-          mkdir -p pages-dist/brand
-          cp -R platform/kin-core/console/kin-webapp/dist/. pages-dist/
-          cp -R apps/web/dist/. pages-dist/brand/
+      - name: Add SPA fallback
+        run: cp dist/index.html dist/404.html
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: pages-dist
+          path: platform/kin-core/console/kin-webapp/dist
 
   deploy:
     environment:

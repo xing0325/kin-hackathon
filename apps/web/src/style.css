@@ -115,7 +115,7 @@ p, h1, h2, h3, dl, dd { margin: 0; }
 }
 
 .brand { display: flex; align-items: center; gap: 11px; width: max-content; font-size: 12px; font-weight: 600; letter-spacing: .16em; }
-.brand img { width: 56px; height: 56px; object-fit: contain; object-position: center; border-radius: 4px; filter: contrast(1.05) brightness(1.08); }
+.brand svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1; }
 .masthead nav { display: flex; gap: 40px; font: 400 9px "DM Mono", monospace; text-transform: uppercase; letter-spacing: .14em; }
 .masthead nav a { opacity: .58; transition: opacity .2s ease; }
 .masthead nav a:hover { opacity: 1; }

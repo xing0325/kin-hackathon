@@ -31,6 +31,8 @@ class AgentProfile(Base):
     public_summary: Mapped[str] = mapped_column(Text, default="")
     embedding_json: Mapped[str] = mapped_column(Text, default="[]")
     visibility: Mapped[str] = mapped_column(String(24), default="event")
+    intelligence_json: Mapped[str] = mapped_column(Text, default="{}")
+    vbti_code: Mapped[Optional[str]] = mapped_column(String(8), nullable=True)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, onupdate=utcnow)
 
 
@@ -179,6 +181,15 @@ class ExperienceCandidate(Base):
     owner_id: Mapped[str] = mapped_column(ForeignKey("users.id"), index=True)
     artifact_json: Mapped[str] = mapped_column(Text)
     source_json: Mapped[str] = mapped_column(Text, default="{}")
+    status: Mapped[str] = mapped_column(String(24), default="pending", index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
+class ProfileIntelligenceCandidate(Base):
+    __tablename__ = "profile_intelligence_candidates"
+    id: Mapped[str] = mapped_column(String(40), primary_key=True)
+    owner_id: Mapped[str] = mapped_column(ForeignKey("users.id"), index=True)
+    candidate_json: Mapped[str] = mapped_column(Text)
     status: Mapped[str] = mapped_column(String(24), default="pending", index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 

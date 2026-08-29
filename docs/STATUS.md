@@ -1,3 +1,9 @@
+## 2026-08-29 Generated KIN artwork integration
+
+- Added a wide negative-space Hero product image and integrated generated woven-light macro and inner technical renders into the product gallery.
+- Image states keep LED points visibly emitting through the textile; cards retain whole-card hover swapping.
+- Verification: frontend tests `4 passed`; Vite build `107 modules transformed`.
+
 ## 2026-08-29 KIN product-state hover gallery
 
 - Added four Polar-inspired product cards to the animated intro; each swaps to a second product state on hover and cycles on touch-only devices.

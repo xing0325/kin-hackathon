@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" role="img" aria-labelledby="title desc">
+<title id="title">KIN Physical AI Architecture</title><desc id="desc">Two Cardputer-Adv devices sense a real-world encounter, use Agent_link over BLE through ROROLEE or relay, and reach KIN Agent services and TiDB before returning screen, sound and shared context outputs.</desc>
+<defs>
+  <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#08111f"/><stop offset="1" stop-color="#101b32"/></linearGradient>
+  <linearGradient id="device" x1="0" x2="1"><stop stop-color="#18395a"/><stop offset="1" stop-color="#245375"/></linearGradient>
+  <linearGradient id="agent" x1="0" x2="1"><stop stop-color="#533280"/><stop offset="1" stop-color="#73419a"/></linearGradient>
+  <linearGradient id="db" x1="0" x2="1"><stop stop-color="#0b625f"/><stop offset="1" stop-color="#159477"/></linearGradient>
+  <filter id="shadow"><feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000" flood-opacity=".35"/></filter>
+  <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 Z" fill="#70e5d0"/></marker>
+  <style>
+    .h{font:700 36px Inter,Arial,sans-serif;fill:#f7fbff}.sub{font:400 17px Inter,Arial,sans-serif;fill:#b9c9df}.boxh{font:700 22px Inter,Arial,sans-serif;fill:#fff}.body{font:400 17px Inter,Arial,sans-serif;fill:#e2edf9}.tiny{font:600 14px Inter,Arial,sans-serif;fill:#9fb4cc}.arrow{stroke:#70e5d0;stroke-width:4;fill:none;marker-end:url(#arrow)}.dashed{stroke-dasharray:10 9}.team{stroke:#f7a35c;stroke-width:3}.official{stroke:#70e5d0;stroke-width:3}.config{stroke:#d49cff;stroke-width:3}
+  </style>
+</defs>
+<rect width="1600" height="1000" fill="url(#bg)"/>
+<text x="72" y="75" class="h">KIN · Physical AI Architecture</text>
+<text x="72" y="110" class="sub">Let your agent meet mine — real-world encounter → agent reasoning → shared context</text>
+<g transform="translate(110 145)"><rect width="1380" height="110" rx="20" fill="#16263d" stroke="#4c6686" stroke-width="2"/>
+<text x="30" y="36" class="boxh">REAL-WORLD INPUT</text><text x="30" y="70" class="body">Nearby Builder presence · G0 / TCA8418 keyboard confirmation · BMI270 shake gesture · optional voice Need</text>
+<circle cx="1300" cy="55" r="20" fill="#f7a35c"/><text x="1335" y="61" class="tiny">human action</text></g>
+<path d="M800 255 V295" class="arrow"/>
+<g transform="translate(110 300)"><rect width="1380" height="200" rx="20" fill="url(#device)" class="team" filter="url(#shadow)"/>
+<text x="30" y="38" class="boxh">TEAM-BUILT DEVICE LAYER · 2 × M5Stack Cardputer-Adv</text>
+<text x="30" y="77" class="body">ESP32-S3 Thin Client · ST7789V2 240×135 screen · BMI270 IMU · TCA8418 56-key keyboard</text>
+<text x="30" y="108" class="body">ES8311 codec + microphone + speaker · battery · stable NODE identity</text>
+<rect x="30" y="133" width="220" height="42" rx="10" fill="#10243b" class="team"/><text x="50" y="160" class="body">Cardputer Board Adapter</text>
+<rect x="270" y="133" width="170" height="42" rx="10" fill="#10243b" class="official"/><text x="296" y="160" class="body">Agent_link SDK</text>
+<text x="1120" y="160" class="tiny">sense · identify · ritual · feedback</text></g>
+<path d="M800 500 V540" class="arrow"/>
+<g transform="translate(110 545)"><rect width="1380" height="115" rx="20" fill="#18233b" class="official"/>
+<text x="30" y="38" class="boxh">OFFICIAL CONNECTIVITY PATH</text><text x="30" y="74" class="body">Agent_link BLE → ROROLEE / Deotaland path → Cloud Agent Gateway</text><text x="890" y="74" class="tiny">team relay available for local demo + diagnostics</text></g>
+<path d="M800 660 V700" class="arrow"/>
+<g transform="translate(110 705)"><rect width="850" height="205" rx="20" fill="url(#agent)" class="team" filter="url(#shadow)"/>
+<text x="30" y="38" class="boxh">TEAM-BUILT KIN AGENT / CUSTOM SERVICES</text>
+<text x="30" y="76" class="body">Profile &amp; Context Compiler · Presence / Radar · Match Engine</text>
+<text x="30" y="108" class="body">Handshake Service · Relationship Memory · Need / Experience Search</text>
+<text x="30" y="140" class="body">Prompt / Policy: explain the match, require bilateral consent, protect raw context</text>
+<text x="30" y="178" class="tiny">Tools: Match · Handshake · Experience · Device Output · SSE events</text></g>
+<g transform="translate(1010 705)"><rect width="480" height="205" rx="20" fill="url(#db)" class="team" filter="url(#shadow)"/>
+<text x="30" y="38" class="boxh">TiDB CLOUD · TEAM DATA LAYER</text>
+<text x="30" y="76" class="body">SQL: profiles · matches · handshakes</text><text x="30" y="108" class="body">relationships · needs · artifacts</text><text x="30" y="140" class="body">Vector Search: VECTOR(64) indexes</text><text x="30" y="178" class="tiny">one source of relationship state + semantic recall</text></g>
+<path d="M960 805 H1010" class="arrow"/>
+<path d="M535 910 V950 H1160 V910" class="arrow dashed"/>
+<g transform="translate(110 930)"><rect width="1380" height="42" rx="12" fill="#15253b"/><text x="25" y="28" class="body">ACTUAL OUTPUT → screen: MATCH FOUND / KIN CONNECTED · speaker: tone · Web/PWA: WHY YOU MATCH / Shared Context / EXPERIENCE FOUND</text></g>
+<g transform="translate(1120 126)"><rect width="370" height="30" rx="8" fill="#122238"/><circle cx="18" cy="15" r="6" fill="#70e5d0"/><text x="32" y="20" class="tiny">Organizer-provided</text><circle cx="145" cy="15" r="6" fill="#d49cff"/><text x="159" y="20" class="tiny">Team-configured</text><circle cx="275" cy="15" r="6" fill="#f7a35c"/><text x="289" y="20" class="tiny">Team-built</text></g>
+</svg>

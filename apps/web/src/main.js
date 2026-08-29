@@ -54,7 +54,7 @@ const waveCanvas = document.querySelector("#wave-grid-canvas");
 const waveState = document.querySelector("#wave-grid-state");
 let waveStateTimer;
 waveCanvas.addEventListener("pointermove", () => {
-  waveState.textContent = "RESPONDING";
+  waveState.textContent = "正在回应";
   clearTimeout(waveStateTimer);
-  waveStateTimer = setTimeout(() => { waveState.textContent = "LISTENING"; }, 1200);
+  waveStateTimer = setTimeout(() => { waveState.textContent = "正在倾听"; }, 1200);
 }, { passive: true });

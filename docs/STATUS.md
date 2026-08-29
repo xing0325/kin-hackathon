@@ -1,3 +1,11 @@
+## 2026-08-29 KIN 中文官网与生态总览 V2
+
+- 官网 13 个叙事区域全面中文化，保留 KIN、Personal Agent、Context Handshake 等产品/协议专名；导航、状态读数、交互提示、产品叙事与隐私说明均改为中文。
+- 新增 Agent 社交层，完整呈现 Builder Radar、Relationship Memory、Campfire、可解释匹配与双方确认逻辑；补充“社交属性 + 编织光斑时尚属性”的产品定义。
+- 新增 KIN 生态与两日开发成果总览：KIN UI、Conversation Collector、浏览器插件、Profile Intelligence Skill、布料光斑素材、KIN Core V0.11，全部提供站内真实下载链接。
+- 新增 GitHub 工程总览与在线产品 Demo 跳转；新增验证数据区，展示 17 张 TiDB 表、3 个向量字段/索引、2 个 ESP32-S3 实体节点与 4 个用户端主入口。
+- 验证：品牌页 Vitest `4 passed`，Vite `106 modules transformed`；桌面端 13 个 section、6 个下载项、无破损图片且无控制台错误；390×844 移动端 `scrollWidth === clientWidth === 375`。
+
 ## 2026-08-29 GitHub 交付同步与 TiDB 合规前置
 
 - README 首屏新增 TiDB 赛事合规说明，明确 TiDB Cloud 承担真实主数据、关系状态和 Vector Search，而非展示性依赖。
@@ -1145,3 +1153,10 @@ What is verified:
 - 提词快捷键与 `?presenter=1` 演讲者视图实测可用；独立副本回滚后恢复为单页原始讲稿包装，主 `MODIFIED_FILE.html` 保持交互路演版本。
 - 交付、diff、验证与回滚材料：`outputs/kin-investor-pitch-html-v0.1/`。
 - 连接修复：新增 `START_PRESENTATION.command`，由独立 Terminal 前台持有本地服务并自动打开首屏；跨命令复检仍为 HTTP 200，避免临时任务结束后端口消失。
+
+## 2026-08-29 最终提交包与团队信息
+
+- README 与最终讲解官网增加具名团队分工：潘昱辰负责产品设计、交互设计、演示与内容；张俊杰负责 KIN Conversation Collector 与 VBTI Handshake 关系交互。
+- 新增 `docs/TEAM_AND_DELIVERY.md`，统一 TiDB/Agent_link 合规口径、团队职责、讲解入口和 8 分钟路演节奏。
+- 生成可离线启动的官网、项目说明 PDF、中文架构图、交付文档与校验文件，并封装为按主办方格式改名后即可上传的 ZIP。
+- 已将桌面现有 `硬件跑通视频.mp4`（34.5 秒）纳入 `15&刘行.zip`，满足“不超过三分钟”的硬件 Demo 备份要求。

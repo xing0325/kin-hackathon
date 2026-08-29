@@ -145,7 +145,7 @@ KIN Agent 接收 Profile、Presence、Need 和硬件事件，执行三类判断�
 - 两台 ESP32 实体节点已通过 Agent_link、Pixel Android Chrome 和 KIN 服务完成真实双边握手；完成反馈只触发一次。
 - TiDB Cloud 已验证 17 张表、3 个 `VECTOR(64)` columns 与 3 个 Vector indexes。
 - 软件 Demo Candidate Gate 已覆盖 API、Web、Collector、Relay、Bridge、migration 与 firmware build。
-- Pixel × 双节点 Physical AI 闭环已通过实板验收并冻结；下一步只需录制三分钟连续 Demo 与保存脱敏 Trace。
+- Pixel × 双节点 Physical AI 闭环已通过实板验收并冻结；提交包已纳入 34.5 秒硬件跑通视频作为现场备份。
 
 证据与最新限制以 [docs/CURRENT.md](docs/CURRENT.md) 和 [docs/STATUS.md](docs/STATUS.md) 为准。
 
@@ -155,18 +155,17 @@ KIN Agent 接收 Profile、Presence、Need 和硬件事件，执行三类判断�
 - 实体节点是 Thin Client，不在 ESP32 上运行大模型；当前开发板不是产品架构的绑定条件。
 - Ask the Room 只分享经用户确认的结构化摘要，不共享完整聊天记录。
 - Demo mode 是确定性 UI 演示，不代表云服务已经启动。
-- 团队成员姓名与最终视频链接需在正式提交前补入交付页。
+- 34.5 秒硬件跑通视频已纳入最终 ZIP，并在桌面提交目录保留独立副本。
 
 ## 团队分工
 
-| 工作流 | 交付内容 |
-| --- | --- |
-| 产品与交互 | Core loop、Context Handshake、Builder Radar、Ask the Room |
-| 硬件与固件 | ESP32-S3 Node Adapter、Agent_link、传感输入、屏幕与声音反馈 |
-| Agent 与服务 | Match Engine、Handshake domain、Experience Search、TiDB |
-| Web 与设计 | 用户端、品牌页、Context Studio、架构与演示材料 |
+| 成员 | 负责方向 | 主要交付 |
+| --- | --- | --- |
+| **潘昱辰** | 产品设计 / 交互设计 / 演示与内容 | 负责产品概念与使用场景设计，梳理核心用户体验与交互流程；参与产品视觉与品牌表达，负责 Demo 展示逻辑、概念视频、演示内容及项目叙事设计。 |
+| **张俊杰** | Tool 与服务 | 负责 **KIN Conversation Collector** 浏览器插件，完成 ChatGPT、Claude、Gemini、豆包、DeepSeek 多平台历史会话采集、并发同步调度、本地存储及 KIN JSON 导出。 |
+| **张俊杰** | 交互设计 | 负责 **VBTI Handshake** 社交交互模块，设计并实现 VBTI 人格测试、握手建联、关系分类、Pair Chemistry 关系分析、关系详情与收藏等核心用户流程。 |
 
-正式提交前在 [交付清单](docs/SUBMISSION_CHECKLIST.md) 中补齐团队成员姓名与对应工作流。
+完整职责与演示口径见 [团队与交付说明](docs/TEAM_AND_DELIVERY.md)。
 
 ## License / Attribution
 

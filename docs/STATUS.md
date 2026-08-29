@@ -1,8 +1,9 @@
-## 2026-08-29 Hover runtime-state fix
+## 2026-08-29 Pixel × 双 Cardputer Phone Handshake Freeze V1
 
-- Added explicit pointerenter/pointerleave state handling on each image rectangle to avoid stale hover behavior after load.
-- Copy/background remains outside the trigger; keyboard focus follows the same state path.
-- Verification: frontend tests `4 passed`; Vite build `107 modules transformed`.
+- 实板验收通过：Pixel Android Chrome 连入两台 Cardputer-Adv；双方进入 KIN LINK、G0 确认、共同握手后显示 `KIN CONNECTED / CONTEXT SAVED`。
+- 修复完成反馈循环：完成状态仅发送一次，约 2 Hz 的 IMU telemetry 不再重复触发响铃。
+- 冻结说明见 `docs/PHONE_HANDSHAKE_FREEZE.md`；固件 SHA256 `74ab43547ee258ec964257ae2d1a91516790a328a919085fc89d139e4e6f23cd`。
+- 冻结验证：用户端 `22 passed`，Vite build `50 modules transformed`，ESP-IDF 5.5.4 build 成功，固件 `0x13c360`、剩余 `69%`。
 
 ## 2026-08-29 Generated KIN artwork integration
 
@@ -1042,3 +1043,97 @@ What is verified:
 - Today 页面按钮改为 `连接两台 KIN 设备`，逐台请求蓝牙权限并显示 `1/2`、`2/2`、`MATCH READY` 状态。
 - Web Bluetooth 仍需 HTTPS、Chrome 前台；后端继续负责 Agent_link 事件、匹配和 Shared Context。
 - 验证：用户端 `21 passed`，Vite build `51 modules transformed`。
+
+## 2026-08-29 KIN high-contrast pass V0.5
+
+What changed:
+
+- 提升深色背景上的正文、描述、匹配理由、导航和 metadata 对比度。
+- `--muted`、`--line`、`--paper` 统一为高对比 token；白色 Inbox 卡片改用深色正文，避免白底灰字。
+- 输入框、卡片和按钮边界提高亮度，保留橙色 Signal 作为强调色。
+
+What is verified:
+
+- `npm test`：21 passed。
+- `npm run build`：51 modules transformed，构建成功。
+- 修改包：`outputs/kin-uiux-contrast-v0.5/`。
+
+## 2026-08-29 KIN signal contrast pass V0.6
+
+What changed:
+
+- Signal 页面五个状态按钮改为 2px 高对比边框；选中态使用浅绿色填充、白色外框和 focus halo。
+- Signal composer 边界、placeholder、footer 提示和 Signal 卡片正文整体提亮，避免黑底灰字。
+- 移动端状态按钮保持至少 52px 高度并支持两列布局。
+
+What is verified:
+
+- `npm test`：21 passed。
+- `npm run build`：51 modules transformed，构建成功。
+- 修改包：`outputs/kin-uiux-signal-contrast-v0.6/`。
+
+## 2026-08-29 KIN Profile Intelligence Skill V0.7 — Profile promotion
+
+- VBTI candidate 现在生成 4 字符 code；approved Profile Intelligence 会写入 `agent_profiles.intelligence_json` 与 `vbti_code`。
+- 新增 migration `0006_profile_intelligence_fields.sql`，ProfileView 暴露 intelligence/vbti_code。
+- FastAPI 回归：16 passed；VBTI code 生成测试 PASS。
+
+## 2026-08-29 KIN Profile Intelligence Skill V1.0 — freeze candidate
+
+- MatchView 新增 `vbti_compatibility` 与 `recommended_modes`。
+- 后端按双方 VBTI Code 计算确定性 Chemistry（0–1）并推荐协作方式；无双方 Code 时返回 null/空列表。
+- 验证：FastAPI 16 passed；`CHEMISTRY_API_RESULT: PASS`。
+- Profile Intelligence 核心闭环达到冻结条件；后续仅接受 bugfix，不再扩展数据范围。
+
+## 2026-08-29 Unified publishing + relationship graph V0.8
+
+What changed:
+
+- 合并动态与求助为单一主导航“动态与求助”，页面内用“发布动态 / 向大家求助”两个高对比标签切换。
+- 旧 `/signals` 路由重定向到 `/ask`，移除重复主导航入口。
+- 关系页面从卡片列表改为中心辐射式关系图谱：当前用户位于中心，每段关系是可点击节点，连线表达共同背景。
+- 节点直接展示对方名称与待完成约定数量，点击进入原有关系详情。
+
+What is verified:
+
+- `npm test`：21 passed。
+- `npm run build`：51 modules transformed，构建成功。
+- 修改包：`outputs/kin-unified-publish-graph-v0.8/`。
+
+## 2026-08-29 KIN 用户端 GitHub Pages 公网部署
+
+- 将最新用户端以 GitHub Pages 专用构建发布到 `gh-pages`：仓库 base `/kin-hackathon/`、HashRouter、确定性 Demo 数据。
+- Pages 公网地址：`https://xing0325.github.io/kin-hackathon/#/ask`。
+- GitHub Pages build `183c84b38148488bbeb0b943654fb33ea0e7df13` 状态 `built`；根页面与 JS 资源均 HTTP 200。
+- 公网浏览器实视显示“动态与求助”、中文导航和 Demo 内容；console warning/error 为 0。
+- 发布验证与回滚材料：`outputs/kin-github-pages-v0.2/`。
+
+## 2026-08-29 KIN 投资人路演 HTML V0.1
+
+What changed:
+
+- 将投资人叙事稿收敛为 12 幕、180 秒的全屏交互路演：Emergence → Islands → Hidden Experience → KIN → Meet → Touch → Remember → Network → Why Hardware → Today → Where This Goes → Demo。
+- 视觉统一为当前 KIN 橙色 `#f77e2d`，复用已有产品图，并新增一张橙色粒子技术织物 wearable 产品图。
+- 提供键盘/滚轮/触摸翻页、康威生命游戏与 Agent 网络动效、提词层、独立演讲者视图、全屏和打印/PDF 模式。
+
+What is verified:
+
+- 静态检查：12 slides、12 speaker notes、总目标时长 180 秒、4 个本地图片资源完整，内联 JavaScript 语法通过。
+- 本地 HTTP 访问返回 200；16:9 浏览器逐页检查无越界文本，4 张图片全部加载，console error/warning 为 0。
+- 提词快捷键与 `?presenter=1` 演讲者视图实测可用；独立副本回滚后恢复为单页原始讲稿包装，主 `MODIFIED_FILE.html` 保持交互路演版本。
+- 交付、diff、验证与回滚材料：`outputs/kin-investor-pitch-html-v0.1/`。
+## 2026-08-29 KIN user web event-driven IA refactor
+
+- 用户端一级导航收敛为 `Today / Ask / Kin / Me`；Radar 下沉为 `Kin → Nearby`，Campfire 由 Today 事件触发，`/signals` 保留兼容路由但不再暴露 Signal schema。
+- Today 改为单一主事件 + 安静建议流，用 Agent 生命状态、时间和 Why Now 取代 Dashboard 卡片堆叠。
+- Ask 改为全局自然语言 Composer：Agent 自动路由 `NEED / BUILDING / SOLVED / DISCOVERED / AVAILABLE`，需求结果先返回 Agent 总结，再展开 Experience Artifact。
+- Context Handshake 新增全屏 `HANDSHAKE → CONNECTED → Shared Context` 转场；Kin 首页改为“为什么现在值得重新联系”的关系列表。
+- Me 第一屏改为 Builder Identity + Current Obsession + Offering/Seeking + AI Life，Context Studio 下沉为二级管理页。
+- 验证：Vitest `22 passed`；Vite `50 modules transformed`；桌面端 Today/Ask/Kin/Me 视觉验收通过；390 px 移动端四入口、无水平溢出；Agent 自动分类与 Handshake 全屏转场交互验收通过。
+## 2026-08-29 KIN user web minimal editorial pass
+
+- 用户端再次减量：Today 次级事件从 3 个收敛到 2 个，移除重复 Quiet Inbox，Network Goal、Device 和 Kin Memory 合并为一条安静状态线。
+- 去掉一级导航的 Unicode / emoji 式符号，改为纯 CSS 线性图形；降低橙色填充、圆角、阴影和卡片数量。
+- 使用内置 ImageGen 生成 KIN Agent 的 woven-organism 主视觉，导出为 768px / 135KB JPEG，集成 Today、Ask、Me 与 Campfire；项目资产路径 `platform/kin-core/console/kin-webapp/public/art/nova-organism-v1.jpg`。
+- 视觉验收：桌面端 Today / Ask 通过；Me / Campfire 生成视觉加载通过；390px 移动端主事件宽度 `339px`，`scrollWidth === clientWidth === 375`，控制台 `errors=[]`。
+- 验证：Vitest `22 passed`；Vite `50 modules transformed`。

@@ -1,3 +1,10 @@
+## 2026-08-29 Product gallery spacing pass
+
+- Reworked product gallery into spacious editorial rows with alternating image/copy columns and larger responsive gutters.
+- Hover remains active across the entire card; text no longer overlays or competes with the product image.
+- Existing generated artwork and under-weave LED visual treatment are unchanged.
+- Verification: frontend tests `4 passed`; Vite build `107 modules transformed`.
+
 ## 2026-08-29 Generated KIN artwork integration
 
 - Added a wide negative-space Hero product image and integrated generated woven-light macro and inner technical renders into the product gallery.

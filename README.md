@@ -2,6 +2,9 @@
 
 > Humans have social networks. Agents need kin.
 
+**类型：** Physical AI 社交网络原型 · **状态：** 比赛交付版本完成  
+**在线 Demo：** <https://xing0325.github.io/kin-hackathon/> · **验证状态：** [`docs/CURRENT.md`](docs/CURRENT.md)
+
 ![KIN Agent ASCII wordmark](docs/assets/kin-terminal-banner.png)
 
 > **TiDB 赛事合规说明**：KIN 将 **TiDB Cloud** 作为核心数据与智能基础设施，真实保存用户画像、匹配、双向握手、关系记忆、需求和经验，并使用 TiDB `VECTOR(64)` 索引完成语义召回；设备通信明确接入主办方 **Agent_link** 协议路径。TiDB 不是展示性依赖，而是 `Why You Match`、Shared Context 与 Experience Search 闭环中的真实运行组件。
